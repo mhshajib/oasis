@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#!/bin/sh
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "main" ]; then
+  echo "You can't commit directly to main branch"
+  exit 1
+fi
+
+## If go build failed then prevent the commit
+files=$(go build .)
+if [[ $? != 0 ]]; then
+  echo "Go build is unsuccessful!"
+  exit 2
+fi
+
+## this will retrieve all of the .go files that have been 
+## changed since the last commit
+STAGED_GO_FILES=$(git diff --cached --diff-filter=ACM --name-only -- '*.go')
+STAGED_GO_MOD=$(git diff --cached --diff-filter=ACM --name-only -- '*.mod')
+STAGED_GO_SUM=$(git diff --cached --diff-filter=ACM --name-only -- '*.sum')
+
+
+if [[ $STAGED_GO_MOD != "" || $STAGED_GO_SUM != ""  ]]; then
+  go mod tidy -v
+  go mod vendor -v
+fi
+
+if [[ $STAGED_GO_MOD != "" ]]; then
+  git add go.mod
+fi
+
+if [[ $STAGED_GO_SUM != "" ]]; then
+  git add go.sum
+fi
+
+## we can check to see if this is empty
+if [[ $STAGED_GO_FILES != "" ]]; then
+    for file in $STAGED_GO_FILES; do
+    
+        # echo "Checking issues in: $file"
+        # go vet $file
+        # if [ $? -ne 0 ]; then { echo "Fix issues in $file file" ; exit 1; } fi
+
+        echo "Formatting: $file"
+        go fmt $file
+
+        ## add any potential changes from our formatting to the 
+        ## commit
+        git add $file
+
+    done
+fi

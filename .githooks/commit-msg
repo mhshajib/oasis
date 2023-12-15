@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# COMMIT_MSG=$(cat "${1:?Missing commit message file}")
+# FC="${COMMIT_MSG:0:1}"
+
+if [[ $(cat $1) =~ ^[a-z] ]]; then
+    echo "Warning: First character of your commit message must be a 'Capital letter'"
+    echo "See some examples below:"
+    echo "> Initial commit"
+    echo "or > Add X functionality"
+    echo "or > Rename X variable to Y"
+    echo "or > Update X configuration file"
+    echo "or > Remove X function"
+    echo "etc"
+    echo "Note: Don't use special character in first case, Also don't use past tense for commit message!"
+    exit 1
+fi
