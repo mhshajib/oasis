@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"fmt"
 	"oasis/pkg/builder"
+	"os/exec"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -31,4 +34,37 @@ func makeBlock(cmd *cobra.Command, args []string) {
 	if allFlag || repoFlag {
 		builder.MakeRepository(cmd, args)
 	}
+
+	// Start the animation in a separate goroutine
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				fmt.Printf("\rExecuting 'go mod tidy' %s", animationFrame())
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}()
+
+	// Execute 'go mod tidy'
+	execCmd := exec.Command("go", "mod", "tidy")
+	err := execCmd.Run()
+	if err != nil {
+		fmt.Println("\nError running 'go mod tidy':", err)
+		done <- true
+		return
+	}
+
+	// Stop the animation
+	done <- true
+	fmt.Println("\r'go mod tidy' executed successfully.")
+}
+
+// animationFrame returns a string representing the current frame of the animation
+func animationFrame() string {
+	frames := []string{"-", "\\", "|", "/"}
+	return frames[time.Now().UnixMilli()/100%int64(len(frames))]
 }

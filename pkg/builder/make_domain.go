@@ -94,13 +94,14 @@ func MakeDomain(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	MakeTimestamp(rootPath)
-
 	err = utils.CreateDirectory(rootPath, config.Paths().DomainPath)
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return
 	}
+
+	MakeTimestamp(rootPath)
+
 	moduleName := args[0]
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
