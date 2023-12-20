@@ -2,12 +2,12 @@ package builder
 
 import (
 	"bytes"
-	"clean-cli/pkg/config"
-	cli_template "clean-cli/pkg/template"
-	"clean-cli/pkg/utils"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"oasis/pkg/config"
+	cli_template "oasis/pkg/template"
+	"oasis/pkg/utils"
 	"os"
 	"os/exec"
 
@@ -28,12 +28,12 @@ func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 	domainTemplateData := struct {
 		UcFirstName     string
 		SmallName       string
-		SnameName       string
+		SnakeCaseName   string
 		SmallPluralName string
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
-		SnameName:       snakeCaseModuleName,
+		SnakeCaseName:   snakeCaseModuleName,
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 	}
 

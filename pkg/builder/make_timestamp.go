@@ -2,11 +2,11 @@ package builder
 
 import (
 	"bytes"
-	"clean-cli/pkg/config"
-	cli_template "clean-cli/pkg/template"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"oasis/pkg/config"
+	cli_template "oasis/pkg/template"
 	"os"
 	"os/exec"
 )
@@ -26,7 +26,7 @@ func parseTimestampTemplate() (string, error) {
 	sourceContent := cli_template.TimeStamp
 
 	// Create a new template and parse the template string
-	parsedTemplate, err := template.New("domainTemplate").Parse(string(sourceContent))
+	parsedTemplate, err := template.New("timestampTemplate").Parse(string(sourceContent))
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return "", err

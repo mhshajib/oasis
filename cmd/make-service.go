@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"clean-cli/pkg/builder"
+	"oasis/pkg/builder"
 
 	"github.com/spf13/cobra"
 )
@@ -20,11 +20,15 @@ var allFlag, domainFlag, migrationFlag, seedFlag, transformFlag, useCaseFlag, re
 func init() {
 	makeBlockCmd.Flags().BoolVar(&allFlag, "all", false, "Create all components")
 	makeBlockCmd.Flags().BoolVar(&domainFlag, "domain", false, "Create domain")
+	makeBlockCmd.Flags().BoolVar(&repoFlag, "repo", false, "Create use case")
 	rootCmd.AddCommand(makeBlockCmd)
 }
 
 func makeBlock(cmd *cobra.Command, args []string) {
 	if allFlag || domainFlag {
 		builder.MakeDomain(cmd, args)
+	}
+	if allFlag || repoFlag {
+		builder.MakeRepository(cmd, args)
 	}
 }

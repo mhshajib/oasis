@@ -2,8 +2,8 @@ package config
 
 import (
 	"bufio"
-	"clean-cli/pkg/utils"
 	"fmt"
+	"oasis/pkg/utils"
 	"os"
 	"strings"
 
@@ -11,8 +11,9 @@ import (
 )
 
 type PathStruct struct {
-	ModuleName string
-	DomainPath string
+	ModuleName  string
+	DomainPath  string
+	ServicePath string
 }
 
 var paths PathStruct
@@ -60,7 +61,8 @@ func getModuleName() string {
 
 func loadPaths() {
 	paths = PathStruct{
-		DomainPath: viper.GetString("paths.domain_paths"),
-		ModuleName: getModuleName(),
+		DomainPath:  viper.GetString("paths.domain_path"),
+		ServicePath: viper.GetString("paths.service_path"),
+		ModuleName:  getModuleName(),
 	}
 }

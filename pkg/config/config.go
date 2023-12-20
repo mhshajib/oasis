@@ -1,8 +1,8 @@
 package config
 
 import (
-	"clean-cli/pkg/utils"
 	"fmt"
+	"oasis/pkg/utils"
 	"os"
 
 	"github.com/spf13/viper"
@@ -18,7 +18,7 @@ func GetEnvDefault(key, defVal string) string {
 
 // Init load configurations from config.yml file
 func Init() error {
-	viper.SetConfigName("clean-cli")
+	viper.SetConfigName("oasis")
 	viper.SetConfigType("yml")
 
 	cwd, err := os.Getwd()

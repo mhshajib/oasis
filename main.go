@@ -1,7 +1,7 @@
 package main
 
 import (
-	"clean-cli/cmd"
+	"oasis/cmd"
 )
 
 func main() {

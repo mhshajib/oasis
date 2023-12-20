@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"clean-cli/pkg/config"
+	"oasis/pkg/config"
 
 	"github.com/spf13/cobra"
 )

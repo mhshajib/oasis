@@ -1,0 +1,3 @@
+paths:
+  domain_path: "domain"
+  service_path: "/"

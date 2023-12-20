@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"clean-cli/pkg/config"
 	"fmt"
+	"oasis/pkg/config"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -12,9 +12,9 @@ import (
 var (
 	// rootCmd is the root command of backup service
 	rootCmd = &cobra.Command{
-		Use:   "clean-cli",
-		Short: "clean-cli service provide cli for making clean block function easier",
-		Long:  `clean-cli service provide cli for making clean block function easier`,
+		Use:   "oasis",
+		Short: "oasis service provide cli for making clean block function easier",
+		Long:  `oasis service provide cli for making clean block function easier`,
 	}
 )
 

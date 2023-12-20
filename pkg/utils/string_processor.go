@@ -6,15 +6,17 @@ import (
 )
 
 // Converts any string format to camelCase
+// Converts any string format to camelCase
 func toCamelCase(str string) string {
 	runes := []rune(str)
 	var result []rune
 	isFirst := true
+	nextUpper := false
 
 	for _, r := range runes {
 		if r == '_' || unicode.IsSpace(r) {
 			// Set flag to capitalize the next non-underscore, non-space character
-			isFirst = false
+			nextUpper = true
 			continue
 		}
 
@@ -22,8 +24,12 @@ func toCamelCase(str string) string {
 			// Only the first character of the entire string is made lowercase
 			result = append(result, unicode.ToLower(r))
 			isFirst = false
+		} else if nextUpper {
+			// Capitalize the character following an underscore or space
+			result = append(result, unicode.ToUpper(r))
+			nextUpper = false
 		} else {
-			// Preserve the original casing of all subsequent characters
+			// Preserve the original casing of all other characters
 			result = append(result, r)
 		}
 	}
