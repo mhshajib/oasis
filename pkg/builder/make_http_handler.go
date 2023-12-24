@@ -119,7 +119,7 @@ func MakeHttpHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateRepositoryFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName, templateString)
+	err = generateHttpHandlerFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating http handler:", err)
 		return

@@ -26,6 +26,7 @@ func init() {
 	makeBlockCmd.Flags().BoolVar(&repoFlag, "repo", false, "Create use case")
 	makeBlockCmd.Flags().BoolVar(&useCaseFlag, "usecase", false, "Create use case")
 	makeBlockCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
+	makeBlockCmd.Flags().BoolVar(&deliveryFlag, "delivery", false, "Create handler")
 	rootCmd.AddCommand(makeBlockCmd)
 }
 
@@ -43,6 +44,10 @@ func makeBlock(cmd *cobra.Command, args []string) {
 
 	if allFlag || transformFlag {
 		builder.MakeTransformer(cmd, args)
+	}
+
+	if allFlag || deliveryFlag {
+		builder.MakeHttpHandler(cmd, args)
 	}
 
 	// Start the animation in a separate goroutine

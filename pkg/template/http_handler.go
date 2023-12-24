@@ -43,7 +43,7 @@ func New{{.UcFirstName}}Handler(r *chi.Mux, uc domain.{{.UcFirstName}}Usecase) {
 
 // ReqCreate{{.UcFirstName}} represents create {{.SmallName}} request
 type ReqCreate{{.UcFirstName}} struct {
-	Field string `json:"field,omitempty"`
+	Field string ` + "`json:\"field,omitempty\"` " + `
 }
 
 // Validate validate create {{.SmallName}} requests
@@ -220,7 +220,7 @@ func (h *{{.UcFirstName}}Handler) FetchByID(w http.ResponseWriter, r *http.Reque
 }
 // ReqUpdate{{.UcFirstName}} represents create {{.SmallName}} request
 type ReqUpdate{{.UcFirstName}} struct {
-	Field string `json:"field,omitempty"`
+	Field string ` + "`json:\"field,omitempty\"` " + `
 }
 
 // Validate validate create {{.SmallName}} requests
