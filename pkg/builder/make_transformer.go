@@ -5,28 +5,29 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"oasis/pkg/config"
-	cli_template "oasis/pkg/template"
 	"os"
 	"os/exec"
 	"strings"
 
+	"oasis/pkg/config"
+	cli_template "oasis/pkg/template"
 	"oasis/pkg/utils"
 
 	"github.com/spf13/cobra"
 )
 
-func usecaseFileExists(servicePath string, snakeCaseModuleName string) bool {
-	usecaseFilePath := fmt.Sprintf("%s/%s/usecase/%s_usecase.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(usecaseFilePath); err == nil {
+func transformerFileExists(servicePath string, snakeCaseModuleName string) bool {
+	transformerFilePath := fmt.Sprintf("%s/%s/transformer/%s_transformer.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
+	if _, err := os.Stat(transformerFilePath); err == nil {
 		return true
 	} else {
 		return false
 	}
 }
 
-func parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
-	usecaseTemplateData := struct {
+func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+	// Prepare the data
+	transformerTemplateData := struct {
 		UcFirstName     string
 		SmallName       string
 		SnakeCaseName   string
@@ -41,10 +42,9 @@ func parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseMod
 	}
 
 	// Read the contents of the template
-	sourceContent := cli_template.UseCase
-
+	sourceContent := cli_template.Transformer
 	// Create a new template and parse the template string
-	parsedTemplate, err := template.New("usecaseTemplate").Parse(string(sourceContent))
+	parsedTemplate, err := template.New("transformerTemplate").Parse(string(sourceContent))
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return "", err
@@ -52,7 +52,7 @@ func parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseMod
 
 	var buf bytes.Buffer
 	// Execute the template with the data
-	err = parsedTemplate.Execute(&buf, usecaseTemplateData)
+	err = parsedTemplate.Execute(&buf, transformerTemplateData)
 	if err != nil {
 		fmt.Println("Error executing parsed template:", err)
 		return "", err
@@ -61,9 +61,9 @@ func parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseMod
 	return buf.String(), nil
 }
 
-func generateUsecaseFile(servicePath string, snakeCaseModuleName string, templateString string) error {
+func generateTransformerFile(servicePath string, snakeCaseModuleName string, templateString string) error {
 	// Create the directory path
-	directoryPath := fmt.Sprintf("%s/%s/usecase", servicePath, snakeCaseModuleName)
+	directoryPath := fmt.Sprintf("%s/%s/transformer", servicePath, snakeCaseModuleName)
 	err := os.MkdirAll(directoryPath, os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
@@ -71,29 +71,29 @@ func generateUsecaseFile(servicePath string, snakeCaseModuleName string, templat
 	}
 
 	// Create the file path
-	usecaseFileName := fmt.Sprintf("%s/%s_usecase.go", directoryPath, snakeCaseModuleName)
+	transformerFileName := fmt.Sprintf("%s/%s_transformer.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(usecaseFileName, []byte(templateString), 0644)
+	err = ioutil.WriteFile(transformerFileName, []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", usecaseFileName)
+	goFmtCmd := exec.Command("go", "fmt", transformerFileName)
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
 	if err != nil {
-		fmt.Println("Error formatting usecase file:", err)
+		fmt.Println("Error formatting transformer file:", err)
 		return err
 	}
 
 	return nil
 }
 
-func MakeUsecase(cmd *cobra.Command, args []string) {
+func MakeTransformer(cmd *cobra.Command, args []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -109,7 +109,7 @@ func MakeUsecase(cmd *cobra.Command, args []string) {
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if usecaseFileExists(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName) {
+	if transformerFileExists(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName) {
 		fmt.Println("Usecase Already Exists With Name:", strings.ToLower(moduleName))
 		return
 	}
@@ -120,9 +120,9 @@ func MakeUsecase(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateUsecaseFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName, templateString)
+	err = generateTransformerFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName, templateString)
 	if err != nil {
-		fmt.Println("Error generating usecase:", err)
+		fmt.Println("Error generating transformer:", err)
 		return
 	}
 

@@ -25,6 +25,7 @@ func init() {
 	makeBlockCmd.Flags().BoolVar(&domainFlag, "domain", false, "Create domain")
 	makeBlockCmd.Flags().BoolVar(&repoFlag, "repo", false, "Create use case")
 	makeBlockCmd.Flags().BoolVar(&useCaseFlag, "usecase", false, "Create use case")
+	makeBlockCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
 	rootCmd.AddCommand(makeBlockCmd)
 }
 
@@ -38,6 +39,10 @@ func makeBlock(cmd *cobra.Command, args []string) {
 
 	if allFlag || useCaseFlag {
 		builder.MakeUsecase(cmd, args)
+	}
+
+	if allFlag || transformFlag {
+		builder.MakeTransformer(cmd, args)
 	}
 
 	// Start the animation in a separate goroutine
