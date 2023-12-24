@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"oasis/pkg/builder"
+	builder "oasis/pkg/builder/service"
 	"os/exec"
 	"time"
 
@@ -10,27 +10,27 @@ import (
 )
 
 var (
-	makeBlockCmd = &cobra.Command{
+	makeServiceCmd = &cobra.Command{
 		Use:   "make:service",
 		Short: "make:service create a new service for project",
 		Long:  "make:service create a new service for project, including a domain, delivery (http), usecase & repository",
 		Args:  cobra.ExactArgs(1),
-		Run:   makeBlock,
+		Run:   makeService,
 	}
 )
 var allFlag, domainFlag, migrationFlag, seedFlag, transformFlag, useCaseFlag, repoFlag, deliveryFlag bool
 
 func init() {
-	makeBlockCmd.Flags().BoolVar(&allFlag, "all", false, "Create all components")
-	makeBlockCmd.Flags().BoolVar(&domainFlag, "domain", false, "Create domain")
-	makeBlockCmd.Flags().BoolVar(&repoFlag, "repo", false, "Create use case")
-	makeBlockCmd.Flags().BoolVar(&useCaseFlag, "usecase", false, "Create use case")
-	makeBlockCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
-	makeBlockCmd.Flags().BoolVar(&deliveryFlag, "delivery", false, "Create handler")
-	rootCmd.AddCommand(makeBlockCmd)
+	makeServiceCmd.Flags().BoolVar(&allFlag, "all", false, "Create all components")
+	makeServiceCmd.Flags().BoolVar(&domainFlag, "domain", false, "Create domain")
+	makeServiceCmd.Flags().BoolVar(&repoFlag, "repo", false, "Create use case")
+	makeServiceCmd.Flags().BoolVar(&useCaseFlag, "usecase", false, "Create use case")
+	makeServiceCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
+	makeServiceCmd.Flags().BoolVar(&deliveryFlag, "delivery", false, "Create handler")
+	rootCmd.AddCommand(makeServiceCmd)
 }
 
-func makeBlock(cmd *cobra.Command, args []string) {
+func makeService(cmd *cobra.Command, args []string) {
 	if allFlag || domainFlag {
 		builder.MakeDomain(cmd, args)
 	}
@@ -58,7 +58,7 @@ func makeBlock(cmd *cobra.Command, args []string) {
 			case <-done:
 				return
 			default:
-				fmt.Printf("\rExecuting 'go mod tidy' %s", animationFrame())
+				fmt.Printf("\rExecuting 'go mod tidy' %s", AnimationFrame())
 				time.Sleep(100 * time.Millisecond)
 			}
 		}
@@ -78,8 +78,8 @@ func makeBlock(cmd *cobra.Command, args []string) {
 	fmt.Println("\r'go mod tidy' executed successfully.")
 }
 
-// animationFrame returns a string representing the current frame of the animation
-func animationFrame() string {
+// AnimationFrame returns a string representing the current frame of the animation
+func AnimationFrame() string {
 	frames := []string{"-", "\\", "|", "/"}
 	return frames[time.Now().UnixMilli()/100%int64(len(frames))]
 }

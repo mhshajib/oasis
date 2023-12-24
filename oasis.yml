@@ -1,3 +1,4 @@
 paths:
-  domain_path: "domain"
+  domain_path: "/domain"
   service_path: "/"
+  config_path: "/pkg/config"
