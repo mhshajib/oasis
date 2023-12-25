@@ -28,6 +28,7 @@ func init() {
 	makeServiceCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
 	makeServiceCmd.Flags().BoolVar(&deliveryFlag, "delivery", false, "Create handler")
 	makeServiceCmd.Flags().BoolVar(&migrationFlag, "migration", false, "Create migration")
+	makeServiceCmd.Flags().BoolVar(&seedFlag, "seed", false, "Create seeder")
 	rootCmd.AddCommand(makeServiceCmd)
 }
 
@@ -53,6 +54,10 @@ func makeService(cmd *cobra.Command, args []string) {
 
 	if allFlag || migrationFlag {
 		builder.MakeMigration(cmd, args)
+	}
+
+	if allFlag || seedFlag {
+		builder.MakeSeeder(cmd, args)
 	}
 
 	// Start the animation in a separate goroutine
