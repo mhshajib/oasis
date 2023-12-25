@@ -1,0 +1,88 @@
+name: Go Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.x.x"
+      - name: Build Binary for Linux
+        run: |
+          env GOOS=linux GOARCH=amd64 go build -o oasis-linux-amd64
+      - name: Build Binary for Windows
+        run: |
+          env GOOS=windows GOARCH=amd64 go build -o oasis-windows-amd64.exe
+      - name: Build Binary for macOS (Intel)
+        run: |
+          env GOOS=darwin GOARCH=amd64 go build -o oasis-darwin-intel-amd64
+      - name: Build Binary for macOS (Apple Silicon)
+        run: |
+          env GOOS=darwin GOARCH=arm64 go build -o oasis-darwin-apple-silicon-arm64
+      - name: Upload Binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            oasis-linux-amd64
+            oasis-windows-amd64.exe
+            oasis-darwin-intel-amd64
+            oasis-darwin-apple-silicon-arm64
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset Linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./oasis-linux-amd64
+          asset_name: oasis-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./oasis-windows-amd64.exe
+          asset_name: oasis-windows-amd64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset macOS (Intel)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./oasis-darwin-amd64
+          asset_name: oasis-darwin-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset macOS (Apple Silicon)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./oasis-darwin-arm64
+          asset_name: oasis-darwin-arm64
+          asset_content_type: application/octet-stream
