@@ -1,4 +1,6 @@
 paths:
-  domain_path: "/domain"
+  domain_path: "domain"
   service_path: "/"
-  config_path: "/pkg/config"
+  config_path: "pkg/config"
+  migration_path: "pkg/migration"
+  seeder_path: "pkg/seeder"

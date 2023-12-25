@@ -27,6 +27,7 @@ func init() {
 	makeServiceCmd.Flags().BoolVar(&useCaseFlag, "usecase", false, "Create use case")
 	makeServiceCmd.Flags().BoolVar(&transformFlag, "transform", false, "Create transformer")
 	makeServiceCmd.Flags().BoolVar(&deliveryFlag, "delivery", false, "Create handler")
+	makeServiceCmd.Flags().BoolVar(&migrationFlag, "migration", false, "Create migration")
 	rootCmd.AddCommand(makeServiceCmd)
 }
 
@@ -48,6 +49,10 @@ func makeService(cmd *cobra.Command, args []string) {
 
 	if allFlag || deliveryFlag {
 		builder.MakeHttpHandler(cmd, args)
+	}
+
+	if allFlag || migrationFlag {
+		builder.MakeMigration(cmd, args)
 	}
 
 	// Start the animation in a separate goroutine
