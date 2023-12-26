@@ -2,10 +2,10 @@ name: Go Build
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "*"
+#    branches:
+#      - main
 
 jobs:
   build:
@@ -24,10 +24,10 @@ jobs:
           RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $RELEASE_URL)
           if echo "$RESPONSE" | grep -q "Not Found"; then
             echo "Release does not exist."
-            echo "::save-state name=exists::false"
+            echo "::set-output name=exists::false"
           else
             echo "Release already exists."
-            echo "::save-state name=exists::true"
+            echo "::set-output name=exists::true"
           fi
       - name: Build Binary for Linux
         run: |
@@ -52,6 +52,7 @@ jobs:
             oasis-darwin-apple-silicon-arm64
       - name: Create Release
         id: create_release
+        if: steps.check_release.outputs.exists == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
