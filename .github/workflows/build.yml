@@ -17,15 +17,17 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: "^1.x.x"
-      - name: Check if Release Already Exists (GitHub CLI)
+      - name: Check if Release Already Exists (curl)
         id: check_release
         run: |
-          if gh release view ${{ github.ref_name }}; then
-            echo "Release already exists."
-            echo "::save-state name=exists::true"
-          else
+          RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}"
+          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $RELEASE_URL)
+          if echo "$RESPONSE" | grep -q "Not Found"; then
             echo "Release does not exist."
             echo "::save-state name=exists::false"
+          else
+            echo "Release already exists."
+            echo "::save-state name=exists::true"
           fi
       - name: Build Binary for Linux
         run: |
