@@ -17,6 +17,16 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: "^1.x.x"
+      - name: Check if Release Already Exists (GitHub CLI)
+        id: check_release
+        run: |
+          if gh release view ${{ github.ref_name }}; then
+            echo "Release already exists."
+            echo "::save-state name=exists::true"
+          else
+            echo "Release does not exist."
+            echo "::save-state name=exists::false"
+          fi
       - name: Build Binary for Linux
         run: |
           env GOOS=linux GOARCH=amd64 go build -o oasis-linux-amd64
