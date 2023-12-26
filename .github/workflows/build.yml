@@ -75,8 +75,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-darwin-amd64
-          asset_name: oasis-darwin-amd64
+          asset_path: ./oasis-darwin-intel-amd64
+          asset_name: oasis-darwin-intel-amd64
           asset_content_type: application/octet-stream
 
       - name: Upload Release Asset macOS (Apple Silicon)
@@ -85,6 +85,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-darwin-arm64
-          asset_name: oasis-darwin-arm64
+          asset_path: ./oasis-darwin-apple-silicon-arm64
+          asset_name: oasis-darwin-apple-silicon-arm64
           asset_content_type: application/octet-stream
