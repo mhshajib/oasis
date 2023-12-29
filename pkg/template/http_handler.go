@@ -11,11 +11,11 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi"
-	"{{.ModuleName}}/domain"
+	"{{.DomainPath}}"
 	"{{.ModuleName}}/pkg/log"
 	"{{.ModuleName}}/pkg/middleware"
 	"{{.ModuleName}}/pkg/utils"
-	"{{.ModuleName}}/{{.SmallName}}/transformer"
+	"{{.TransformerPath}}"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

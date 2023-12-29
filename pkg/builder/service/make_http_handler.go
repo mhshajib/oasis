@@ -17,7 +17,7 @@ import (
 
 func httpHandlerFileExists(servicePath string, snakeCaseModuleName string) bool {
 	httpHandlerFilePath := fmt.Sprintf("%s/%s/delivery/http/%s_handler.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(httpHandlerFilePath); err == nil {
+	if _, err := os.Stat(utils.NormalizePath(httpHandlerFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -32,12 +32,16 @@ func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 		SnakeCaseName   string
 		SmallPluralName string
 		ModuleName      string
+		DomainPath      string
+		TransformerPath string
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
 		SnakeCaseName:   snakeCaseModuleName,
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 		ModuleName:      config.Paths().ModuleName,
+		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
+		TransformerPath: utils.NormalizePath(fmt.Sprintf("%s/%s/%s/transformer", config.Paths().ModuleName, config.Paths().ServicePath, camelCaseModuleName)),
 	}
 
 	// Read the contents of the file
@@ -64,7 +68,7 @@ func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, templateString string) error {
 	// Create the directory path
 	directoryPath := fmt.Sprintf("%s/%s/delivery/http", servicePath, snakeCaseModuleName)
-	err := os.MkdirAll(directoryPath, os.ModePerm) // os.ModePerm is 0777
+	err := os.MkdirAll(utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return err
@@ -108,7 +112,8 @@ func MakeHttpHandler(cmd *cobra.Command, args []string) {
 
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
-	if httpHandlerFileExists(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName) {
+	filePath := utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath))
+	if httpHandlerFileExists(filePath, snakeCaseModuleName) {
 		fmt.Println("Http Handler Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
@@ -119,7 +124,7 @@ func MakeHttpHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateHttpHandlerFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath), snakeCaseModuleName, templateString)
+	err = generateHttpHandlerFile(filePath, snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating http handler:", err)
 		return
