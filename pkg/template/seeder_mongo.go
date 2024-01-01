@@ -6,10 +6,10 @@ package seeder
 import (
 	"context"
 
-	"{{.ModuleName}}/domain"
+	"{{.DomainPath}}"
 	"{{.ModuleName}}/pkg/log"
-	r "{{.ModuleName}}/{{.SmallName}}/repository"
-	uc "{{.ModuleName}}/{{.SmallName}}/usecase"
+	r "{{.RepositoryPath}}"
+	uc "{{.UsecasePath}}"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

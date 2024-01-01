@@ -78,14 +78,14 @@ func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, tem
 	httpHandlerFileName := fmt.Sprintf("%s/%s_handler.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(httpHandlerFileName, []byte(templateString), 0644)
+	err = ioutil.WriteFile(utils.NormalizePath(httpHandlerFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", httpHandlerFileName)
+	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(httpHandlerFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()

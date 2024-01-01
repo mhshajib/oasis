@@ -4,7 +4,7 @@ var Transformer string = `
 package transformer
 
 import (
-	"{{.ModuleName}}/domain"
+	"{{.DomainPath}}"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

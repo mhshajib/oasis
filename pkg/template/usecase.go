@@ -6,7 +6,7 @@ package usecase
 import (
 	"context"
 
-	"{{.ModuleName}}/domain"
+	"{{.DomainPath}}"
 )
 
 // {{.UcFirstName}}Usecase represents {{.SmallName}} usecases

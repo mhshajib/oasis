@@ -31,12 +31,14 @@ func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseM
 		SnakeCaseName   string
 		SmallPluralName string
 		ModuleName      string
+		DomainPath      string
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
 		SnakeCaseName:   snakeCaseModuleName,
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 		ModuleName:      config.Paths().ModuleName,
+		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
 	}
 
 	// Read the contents of the file
@@ -65,14 +67,14 @@ func generateMigrationFile(migrationPath string, snakeCaseModuleName string, tem
 	migrationFileName := fmt.Sprintf("%s/%s.go", migrationPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err := ioutil.WriteFile(migrationFileName, []byte(templateString), 0644)
+	err := ioutil.WriteFile(utils.NormalizePath(migrationFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", migrationFileName)
+	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(migrationFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -100,7 +102,7 @@ func MakeMigration(cmd *cobra.Command, args []string) {
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if migrationFileExists(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath), snakeCaseModuleName) {
+	if migrationFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath)), snakeCaseModuleName) {
 		fmt.Println("Migration Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
