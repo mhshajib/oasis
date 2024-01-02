@@ -61,7 +61,10 @@ func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 func generateDomainFile(domainPath string, snakeCaseModuleName string, templateString string) error {
 
 	domainFileName := fmt.Sprintf("%s/%s.go", domainPath, snakeCaseModuleName)
-
+	fmt.Println("--------------")
+	fmt.Println(domainFileName)
+	fmt.Println(utils.NormalizePath(domainFileName))
+	fmt.Println("--------------")
 	// Write the code to the file
 	err := ioutil.WriteFile(utils.NormalizePath(domainFileName), []byte(templateString), 0644)
 	if err != nil {
