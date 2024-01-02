@@ -18,7 +18,7 @@ import (
 
 func transformerFileExists(servicePath string, snakeCaseModuleName string) bool {
 	transformerFilePath := fmt.Sprintf("%s/%s/transformer/%s_transformer.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(transformerFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(transformerFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -66,7 +66,7 @@ func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 func generateTransformerFile(servicePath string, snakeCaseModuleName string, templateString string) error {
 	// Create the directory path
 	directoryPath := fmt.Sprintf("%s/%s/transformer", servicePath, snakeCaseModuleName)
-	err := os.MkdirAll(utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return err
@@ -76,14 +76,14 @@ func generateTransformerFile(servicePath string, snakeCaseModuleName string, tem
 	transformerFileName := fmt.Sprintf("%s/%s_transformer.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(utils.NormalizePath(transformerFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(transformerFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(transformerFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(transformerFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -111,7 +111,7 @@ func MakeTransformer(cmd *cobra.Command, args []string) {
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if transformerFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
+	if transformerFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
 		fmt.Println("Usecase Already Exists With Name:", strings.ToLower(moduleName))
 		return
 	}
@@ -122,7 +122,7 @@ func MakeTransformer(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateTransformerFile(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
+	err = generateTransformerFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating transformer:", err)
 		return

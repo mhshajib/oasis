@@ -16,7 +16,7 @@ import (
 
 func repositoryFileExists(servicePath string, snakeCaseModuleName string) bool {
 	repositoryFilePath := fmt.Sprintf("%s/%s/repository/%s_mongo.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(repositoryFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(repositoryFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -66,7 +66,7 @@ func generateRepositoryFile(servicePath string, snakeCaseModuleName string, temp
 
 	// Create the directory path
 	directoryPath := fmt.Sprintf("%s/%s/repository", servicePath, snakeCaseModuleName)
-	err := os.MkdirAll(utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return err
@@ -76,14 +76,14 @@ func generateRepositoryFile(servicePath string, snakeCaseModuleName string, temp
 	repositoryFileName := fmt.Sprintf("%s/%s_mongo.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(utils.NormalizePath(repositoryFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(repositoryFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(repositoryFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(repositoryFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -111,7 +111,7 @@ func MakeRepository(cmd *cobra.Command, args []string) {
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if repositoryFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
+	if repositoryFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
 		fmt.Println("Domain Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
@@ -122,7 +122,7 @@ func MakeRepository(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateRepositoryFile(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
+	err = generateRepositoryFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating repository:", err)
 		return

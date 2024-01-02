@@ -16,7 +16,7 @@ import (
 
 func domainFileExists(domainPath string, snakeCaseModuleName string) bool {
 	domainFilePath := fmt.Sprintf("%s/%s.go", domainPath, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(domainFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(domainFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -61,19 +61,15 @@ func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 func generateDomainFile(domainPath string, snakeCaseModuleName string, templateString string) error {
 
 	domainFileName := fmt.Sprintf("%s/%s.go", domainPath, snakeCaseModuleName)
-	fmt.Println("--------------")
-	fmt.Println(domainFileName)
-	fmt.Println(utils.NormalizePath(domainFileName))
-	fmt.Println("--------------")
 	// Write the code to the file
-	err := ioutil.WriteFile(utils.NormalizePath(domainFileName), []byte(templateString), 0644)
+	err := ioutil.WriteFile("/"+utils.NormalizePath(domainFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(domainFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(domainFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -109,7 +105,7 @@ func MakeDomain(cmd *cobra.Command, args []string) {
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if domainFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().DomainPath)), snakeCaseModuleName) {
+	if domainFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().DomainPath)), snakeCaseModuleName) {
 		fmt.Println("Domain Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
@@ -120,7 +116,7 @@ func MakeDomain(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateDomainFile(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().DomainPath)), snakeCaseModuleName, templateString)
+	err = generateDomainFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().DomainPath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating domain:", err)
 		return

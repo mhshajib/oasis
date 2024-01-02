@@ -18,7 +18,7 @@ import (
 
 func usecaseFileExists(servicePath string, snakeCaseModuleName string) bool {
 	usecaseFilePath := fmt.Sprintf("%s/%s/usecase/%s_usecase.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(usecaseFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(usecaseFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -66,7 +66,7 @@ func parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseMod
 func generateUsecaseFile(servicePath string, snakeCaseModuleName string, templateString string) error {
 	// Create the directory path
 	directoryPath := fmt.Sprintf("%s/%s/usecase", servicePath, snakeCaseModuleName)
-	err := os.MkdirAll(utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return err
@@ -76,14 +76,14 @@ func generateUsecaseFile(servicePath string, snakeCaseModuleName string, templat
 	usecaseFileName := fmt.Sprintf("%s/%s_usecase.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(utils.NormalizePath(usecaseFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(usecaseFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(usecaseFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(usecaseFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -111,7 +111,7 @@ func MakeUsecase(cmd *cobra.Command, args []string) {
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if usecaseFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
+	if usecaseFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
 		fmt.Println("Usecase Already Exists With Name:", strings.ToLower(moduleName))
 		return
 	}
@@ -122,7 +122,7 @@ func MakeUsecase(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateUsecaseFile(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
+	err = generateUsecaseFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating usecase:", err)
 		return

@@ -17,7 +17,7 @@ import (
 
 func httpHandlerFileExists(servicePath string, snakeCaseModuleName string) bool {
 	httpHandlerFilePath := fmt.Sprintf("%s/%s/delivery/http/%s_handler.go", servicePath, snakeCaseModuleName, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(httpHandlerFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(httpHandlerFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -68,7 +68,7 @@ func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, templateString string) error {
 	// Create the directory path
 	directoryPath := fmt.Sprintf("%s/%s/delivery/http", servicePath, snakeCaseModuleName)
-	err := os.MkdirAll(utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return err
@@ -78,14 +78,14 @@ func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, tem
 	httpHandlerFileName := fmt.Sprintf("%s/%s_handler.go", directoryPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err = ioutil.WriteFile(utils.NormalizePath(httpHandlerFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(httpHandlerFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(httpHandlerFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(httpHandlerFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -112,7 +112,7 @@ func MakeHttpHandler(cmd *cobra.Command, args []string) {
 
 	moduleName := args[0]
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
-	filePath := utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath))
+	filePath := "/" + utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath))
 	if httpHandlerFileExists(filePath, snakeCaseModuleName) {
 		fmt.Println("Http Handler Already Exists With Name:", snakeCaseModuleName)
 		return

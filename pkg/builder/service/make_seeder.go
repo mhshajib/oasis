@@ -16,7 +16,7 @@ import (
 
 func seederFileExists(seederPath string, snakeCaseModuleName string) bool {
 	seederFilePath := fmt.Sprintf("%s/%s.go", seederPath, snakeCaseModuleName)
-	if _, err := os.Stat(utils.NormalizePath(seederFilePath)); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(seederFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -71,14 +71,14 @@ func generateSeederFile(seederPath string, snakeCaseModuleName string, templateS
 	seederFileName := fmt.Sprintf("%s/%s.go", seederPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err := ioutil.WriteFile(utils.NormalizePath(seederFileName), []byte(templateString), 0644)
+	err := ioutil.WriteFile("/"+utils.NormalizePath(seederFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(seederFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(seederFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -106,7 +106,7 @@ func MakeSeeder(cmd *cobra.Command, args []string) {
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if seederFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().SeederPath)), snakeCaseModuleName) {
+	if seederFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().SeederPath)), snakeCaseModuleName) {
 		fmt.Println("Seeder Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
@@ -117,7 +117,7 @@ func MakeSeeder(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateSeederFile(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().SeederPath)), snakeCaseModuleName, templateString)
+	err = generateSeederFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().SeederPath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating seeder:", err)
 		return

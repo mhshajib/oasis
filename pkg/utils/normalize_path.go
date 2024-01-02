@@ -9,8 +9,6 @@ func NormalizePath(input string) string {
 	// Use path.Clean to normalize the slashes
 	cleanedPath := path.Clean(input)
 
-	trimmedPath := strings.TrimPrefix(cleanedPath, "/")
-
 	// Remove leading slash if it exists
-	return "/" + trimmedPath
+	return strings.TrimPrefix(cleanedPath, "/")
 }

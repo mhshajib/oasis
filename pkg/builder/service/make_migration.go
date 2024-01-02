@@ -16,7 +16,7 @@ import (
 
 func migrationFileExists(migrationPath string, snakeCaseModuleName string) bool {
 	migrationFilePath := fmt.Sprintf("%s/%s.go", migrationPath, snakeCaseModuleName)
-	if _, err := os.Stat(migrationFilePath); err == nil {
+	if _, err := os.Stat("/" + utils.NormalizePath(migrationFilePath)); err == nil {
 		return true
 	} else {
 		return false
@@ -67,14 +67,14 @@ func generateMigrationFile(migrationPath string, snakeCaseModuleName string, tem
 	migrationFileName := fmt.Sprintf("%s/%s.go", migrationPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err := ioutil.WriteFile(utils.NormalizePath(migrationFileName), []byte(templateString), 0644)
+	err := ioutil.WriteFile("/"+utils.NormalizePath(migrationFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
 	}
 
 	// Execute the `go fmt` command
-	goFmtCmd := exec.Command("go", "fmt", utils.NormalizePath(migrationFileName))
+	goFmtCmd := exec.Command("go", "fmt", "/"+utils.NormalizePath(migrationFileName))
 	goFmtCmd.Stdout = os.Stdout
 	goFmtCmd.Stderr = os.Stderr
 	err = goFmtCmd.Run()
@@ -102,7 +102,7 @@ func MakeMigration(cmd *cobra.Command, args []string) {
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
-	if migrationFileExists(utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath)), snakeCaseModuleName) {
+	if migrationFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath)), snakeCaseModuleName) {
 		fmt.Println("Migration Already Exists With Name:", snakeCaseModuleName)
 		return
 	}
@@ -113,7 +113,7 @@ func MakeMigration(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generateMigrationFile(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath), snakeCaseModuleName, templateString)
+	err = generateMigrationFile("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().MigrationPath)), snakeCaseModuleName, templateString)
 	if err != nil {
 		fmt.Println("Error generating migration:", err)
 		return
