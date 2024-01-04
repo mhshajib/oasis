@@ -10,7 +10,7 @@ import (
 
 // {{.UcFirstName}} response body
 type {{.UcFirstName}} struct {
-	ID         primitive.ObjectID  ` + "`json:\"_id,omitempty\"` " + `
+	ID         	   string  ` + "`json:\"_id,omitempty\"` " + `
 	FieldOne       string              ` + "`json:\"field_one,omitempty\"` " + `
 	TimeStamp   domain.TimeStamp    ` + "`json:\"timestamp\"` " + `
 }
