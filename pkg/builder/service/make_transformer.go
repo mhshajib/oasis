@@ -112,11 +112,11 @@ func MakeTransformer(cmd *cobra.Command, args []string) {
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
 	if transformerFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
-		fmt.Println("Usecase Already Exists With Name:", strings.ToLower(moduleName))
+		fmt.Println("transformer Already Exists With Name:", strings.ToLower(moduleName))
 		return
 	}
 
-	templateString, err := parseUsecaseTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
@@ -128,5 +128,5 @@ func MakeTransformer(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(fmt.Sprintf("Usecase created and formatted successfully! with name: %s", snakeCaseModuleName))
+	fmt.Println(fmt.Sprintf("Transformer created and formatted successfully! with name: %s", snakeCaseModuleName))
 }
