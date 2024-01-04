@@ -31,7 +31,7 @@ func New{{.UcFirstName}}Handler(r *chi.Mux, uc domain.{{.UcFirstName}}Usecase) {
 	}
 	r.Route("/v1/{{.SmallPluralName}}", func(r chi.Router) {
 		// all the routes are protected
-		r.Use(middleware.Auth)
+		// r.Use(middleware.Auth)
 
 		r.Post("/", handler.Store)
 		r.Get("/", handler.Fetch)
@@ -43,16 +43,16 @@ func New{{.UcFirstName}}Handler(r *chi.Mux, uc domain.{{.UcFirstName}}Usecase) {
 
 // ReqCreate{{.UcFirstName}} represents create {{.SmallName}} request
 type ReqCreate{{.UcFirstName}} struct {
-	Field string ` + "`json:\"field,omitempty\"` " + `
+	FieldOne string ` + "`json:\"field_one,omitempty\"` " + `
 }
 
 // Validate validate create {{.SmallName}} requests
 func (r *ReqCreate{{.UcFirstName}}) Validate(ctx context.Context) utils.Errors {
-	r.Field = strings.TrimSpace(r.Field)
+	r.FieldOne = strings.TrimSpace(r.FieldOne)
 
 	errs := utils.Errors{}
-	if r.Field == "" {
-		errs.Add("field", "is required")
+	if r.FieldOne == "" {
+		errs.Add("field_one", "is required")
 	}
 
 	return errs
@@ -93,7 +93,7 @@ func (h *{{.UcFirstName}}Handler) Store(w http.ResponseWriter, r *http.Request) 
 	}
 
 	{{.SmallName}} := domain.{{.UcFirstName}}{
-		Field: req.Field,
+		FieldOne: req.FieldOne,
 	}
 
 	if err := h.{{.UcFirstName}}Usecase.Store(ctx, &{{.SmallName}}); err != nil {
@@ -139,8 +139,8 @@ func (h *{{.UcFirstName}}Handler) Fetch(w http.ResponseWriter, r *http.Request) 
 		ctr.ID = &v
 	}
 
-	if v := r.URL.Query().Get("field"); v != "" {
-		ctr.Field = &v
+	if v := r.URL.Query().Get("field_one"); v != "" {
+		ctr.FieldOne = &v
 	}
 
 	if v := r.URL.Query().Get("asc"); v != "" {
@@ -220,16 +220,16 @@ func (h *{{.UcFirstName}}Handler) FetchByID(w http.ResponseWriter, r *http.Reque
 }
 // ReqUpdate{{.UcFirstName}} represents create {{.SmallName}} request
 type ReqUpdate{{.UcFirstName}} struct {
-	Field string ` + "`json:\"field,omitempty\"` " + `
+	FieldOne string ` + "`json:\"field_one,omitempty\"` " + `
 }
 
 // Validate validate create {{.SmallName}} requests
 func (r *ReqUpdate{{.UcFirstName}}) Validate(ctx context.Context) utils.Errors {
-	r.Field = strings.TrimSpace(r.Field)
+	r.FieldOne = strings.TrimSpace(r.FieldOne)
 
 	errs := utils.Errors{}
-	if r.Field == "" {
-		errs.Add("field", "is required")
+	if r.FieldOne == "" {
+		errs.Add("field_one", "is required")
 	}
 
 	return errs
@@ -297,8 +297,8 @@ func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if v := req.Field; v != "" {
-		{{.SmallName}}.Field = v
+	if v := req.FieldOne; v != "" {
+		{{.SmallName}}.FieldOne = v
 	}
 
 	if err := h.{{.UcFirstName}}Usecase.Update(ctx, {{.SmallName}}); err != nil {
