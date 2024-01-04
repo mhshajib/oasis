@@ -43,7 +43,7 @@ func New{{.UcFirstName}}Mongo(db *mongo.Database) domain.{{.UcFirstName}}Reposit
 }
 
 // Store insert a new {{.SmallName}} to mongodb
-func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
+func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*domain.{{.UcFirstName}}, error) {
 	{{.SmallName}}Data := {{.UcFirstName}}{
 		FieldOne:     {{.SmallName}}.FieldOne,
 		TimeStamp: TimeStamp{
@@ -173,7 +173,7 @@ func (r *{{.UcFirstName}}Mongo) FetchOne(ctx context.Context, ctr *domain.{{.UcF
 }
 
 // Update update a {{.SmallName}} record
-func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
+func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*domain.{{.UcFirstName}}, error) {
 	if {{.SmallName}}.ID == "" {
 		return nil, errors.New("repository:mongodb: Update failed: {{.SmallName}} id required")
 	}
