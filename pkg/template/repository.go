@@ -174,7 +174,7 @@ func (r *{{.UcFirstName}}Mongo) FetchOne(ctx context.Context, ctr *domain.{{.UcF
 
 // Update update a {{.SmallName}} record
 func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
-	if {{.SmallName}}.ID.Hex() == "" {
+	if {{.SmallName}}.ID == "" {
 		return nil, errors.New("repository:mongodb: Update failed: {{.SmallName}} id required")
 	}
 	objectId, err := primitive.ObjectIDFromHex({{.SmallName}}.ID)

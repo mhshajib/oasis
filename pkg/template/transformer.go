@@ -26,10 +26,10 @@ func Transform{{.UcFirstName}}(t *domain.{{.UcFirstName}}) *{{.UcFirstName}} {
 
 // Transform{{.UcFirstName}}List ...
 func Transform{{.UcFirstName}}List(tl []*domain.{{.UcFirstName}}) []*{{.UcFirstName}} {
-	{{.SmallName}} := make([]*{{.UcFirstName}}, 0)
+	{{.SmallPluralName}} := make([]*{{.UcFirstName}}, 0)
 	for _, t := range tl {
-		{{.SmallName}} = append({{.SmallName}}, Transform{{.UcFirstName}}(t))
+		{{.SmallPluralName}} = append({{.SmallPluralName}}, Transform{{.UcFirstName}}(t))
 	}
-	return {{.SmallName}}
+	return {{.SmallPluralName}}
 }
 `
