@@ -26,20 +26,20 @@ type {{.UcFirstName}}Criteria struct {
 
 // {{.UcFirstName}}Repository represents {{.SmallName}}'s repository contract
 type {{.UcFirstName}}Repository interface {
-    Store(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) error
+    Store(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) (*{{.UcFirstName}}, error)
     Fetch(ctx context.Context, ctr *{{.UcFirstName}}Criteria) ([]*{{.UcFirstName}}, error)
     FetchOne(ctx context.Context, ctr *{{.UcFirstName}}Criteria) (*{{.UcFirstName}}, error)
     Count(ctx context.Context, ctr *{{.UcFirstName}}Criteria) (int64, error)
-    Update(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) error
+    Update(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) (*{{.UcFirstName}}, error)
     Delete(ctx context.Context, ctr *{{.UcFirstName}}Criteria) error
 }
 
 // {{.UcFirstName}}Usecase represents {{.SmallName}}'s usecase contract
 type {{.UcFirstName}}Usecase interface {
-    Store(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) error
+    Store(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) (*{{.UcFirstName}}, error)
     Fetch(ctx context.Context, ctr *{{.UcFirstName}}Criteria) ([]*{{.UcFirstName}}, error)
     FetchOne(ctx context.Context, ctr *{{.UcFirstName}}Criteria) (*{{.UcFirstName}}, error)
-    Update(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) error
+    Update(ctx context.Context, {{.SmallName}} *{{.UcFirstName}}) (*{{.UcFirstName}}, error)
     Delete(ctx context.Context, ctr *{{.UcFirstName}}Criteria) error
 }
 

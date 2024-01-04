@@ -22,7 +22,7 @@ func New{{.UcFirstName}}Usecase(r domain.{{.UcFirstName}}Repository) *{{.UcFirst
 }
 
 // Store insert a new {{.SmallName}} to storage
-func (u *{{.UcFirstName}}Usecase) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) error {
+func (u *{{.UcFirstName}}Usecase) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
 	{{.SmallName}}.PopulateCreateTimeStamp() // generate created_at & updated_at field
 
 	return u.{{.SmallName}}Repository.Store(ctx, {{.SmallName}})
@@ -44,7 +44,7 @@ func (u *{{.UcFirstName}}Usecase) FetchOne(ctx context.Context, ctr *domain.{{.U
 }
 
 // Update update a {{.SmallName}} record
-func (u *{{.UcFirstName}}Usecase) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) error {
+func (u *{{.UcFirstName}}Usecase) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
 	{{.SmallName}}.PopulateUpdateTimeStamp() // update the updated_at timestamp
 	return u.{{.SmallName}}Repository.Update(ctx, {{.SmallName}})
 }

@@ -17,9 +17,9 @@ import (
 )
 
 type TimeStamp struct {
-	CreatedAt time.Time  ` + "`json:\"created_at\"` " + `
-	UpdatedAt time.Time  ` + "`json:\"updated_at\"` " + `
-	DeletedAt *time.Time ` + "`json:\"deleted_at\"` " + `
+	CreatedAt time.Time  ` + "`bson:\"created_at\"` " + `
+	UpdatedAt time.Time  ` + "`bson:\"updated_at\"` " + `
+	DeletedAt *time.Time ` + "`bson:\"deleted_at\"` " + `
 }
 
 type {{.UcFirstName}} struct {
@@ -43,16 +43,21 @@ func New{{.UcFirstName}}Mongo(db *mongo.Database) domain.{{.UcFirstName}}Reposit
 }
 
 // Store insert a new {{.SmallName}} to mongodb
-func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) error {
+func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
 	{{.SmallName}}Data := {{.UcFirstName}}{
-		
+		FieldOne:     {{.SmallName}}.FieldOne,
+		TimeStamp: TimeStamp{
+			CreatedAt: {{.SmallName}}.CreatedAt,
+			UpdatedAt: {{.SmallName}}.UpdatedAt,
+			DeletedAt: {{.SmallName}}.DeletedAt,
+		},
 	}
-	result, err := r.c.InsertOne(ctx, {{.SmallName}})
+	result, err := r.c.InsertOne(ctx, {{.SmallName}}Data)
 	if err != nil {
-		return fmt.Errorf("repository:mongo: failed to Store {{.SmallName}}: %v", err)
+		return nil, fmt.Errorf("repository:mongo: failed to Store {{.SmallName}}: %v", err)
 	}
 	{{.SmallName}}.ID = result.InsertedID.(primitive.ObjectID).Hex()
-	return nil
+	return {{.SmallName}}, nil
 }
 
 // Fetch list {{.SmallName}} from mongodb based on criteria
@@ -88,7 +93,7 @@ func (r *{{.UcFirstName}}Mongo) Fetch(ctx context.Context, ctr *domain.{{.UcFirs
 		opts.SetSort(bson.M{"timestamp.created_at": -1})
 	}
 
-	var {{.SmallName}}List = make([]*domain.{{.UcFirstName}}, 0)
+	var {{.SmallName}}List = make([]*{{.UcFirstName}}, 0)
 	cursor, err := r.c.Find(ctx, filter, &opts)
 	if err != nil {
 		return nil, fmt.Errorf("repository:mongo: failed to Fetch {{.SmallName}}: %v", err)
@@ -100,7 +105,7 @@ func (r *{{.UcFirstName}}Mongo) Fetch(ctx context.Context, ctr *domain.{{.UcFirs
 		return nil, fmt.Errorf("repository:mongo: failed to decode {{.SmallName}}: %v", err)
 	}
 
-	return {{.SmallName}}List, nil
+	return convert{{.UcFirstName}}List({{.SmallName}}List), nil
 }
 
 // Count return the total {{.SmallName}} count from mongodb based on criteria
@@ -157,54 +162,71 @@ func (r *{{.UcFirstName}}Mongo) FetchOne(ctx context.Context, ctr *domain.{{.UcF
 		}
 	}
 
-	var {{.SmallName}} domain.{{.UcFirstName}}
+	var {{.SmallName}} {{.UcFirstName}}
 	if err := r.c.FindOne(ctx, filter).Decode(&{{.SmallName}}); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, domain.Err{{.UcFirstName}}NotFound
 		}
 		return nil, fmt.Errorf("repository:mongo: failed to FetchOne {{.SmallName}}: %v", err)
 	}
-	return &{{.SmallName}}, nil
+	return convert{{.UcFirstName}}(&{{.SmallName}}), nil
 }
 
 // Update update a {{.SmallName}} record
-func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) error {
+func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*{{.UcFirstName}}, error) {
 	if {{.SmallName}}.ID.Hex() == "" {
-		return errors.New("repository:mongodb: Update failed: {{.SmallName}} id required")
+		return nil, errors.New("repository:mongodb: Update failed: {{.SmallName}} id required")
 	}
-	filter := bson.M{"_id": {{.SmallName}}.ID}
-	bb, err := bson.Marshal({{.SmallName}})
+	objectId, err := primitive.ObjectIDFromHex({{.SmallName}}.ID)
 	if err != nil {
-		return fmt.Errorf("repository:mongodb: Update failed: %v", err)
+		return nil, errors.New("repository:mongodb: Update failed: {{.SmallName}} primary id unable to convert from hex to ObjectID")
+	}
+
+	filter := bson.M{"_id": objectId}
+	{{.SmallName}}Data := {{.UcFirstName}}{
+		ID:           objectId,
+		FieldOne:     {{.SmallName}}.FieldOne,
+		TimeStamp: TimeStamp{
+			CreatedAt: {{.SmallName}}.CreatedAt,
+			UpdatedAt: {{.SmallName}}.UpdatedAt,
+			DeletedAt: {{.SmallName}}.DeletedAt,
+		},
+	}
+
+	bb, err := bson.Marshal({{.SmallName}}Data)
+	if err != nil {
+		return nil, fmt.Errorf("repository:mongodb: Update failed: %v", err)
 	}
 
 	var update bson.M
 	if err := bson.Unmarshal(bb, &update); err != nil {
-		return fmt.Errorf("repository:mongodb: Update failed: %v", err)
+		return nil, fmt.Errorf("repository:mongodb: Update failed: %v", err)
 	}
 
 	result, err := r.c.UpdateOne(ctx, filter, bson.D{{"{{"}}Key: "$set", Value: update{{"}}"}})
 	if err != nil {
-		return fmt.Errorf("repository:mongodb: Update failed: %v", err)
+		return nil, fmt.Errorf("repository:mongodb: Update failed: %v", err)
 	}
 
 	if result.ModifiedCount == 0 {
-		return errors.New("repository:mongodb: Update failed: 0 document modified")
+		return nil, errors.New("repository:mongodb: Update failed: 0 document modified")
 	}
 
-	return nil
+	return {{.SmallName}}, nil
 }
 
 // Delete soft delete a {{.SmallName}} record
 func (r *{{.UcFirstName}}Mongo) Delete(ctx context.Context, ctr *domain.{{.UcFirstName}}Criteria) error {
-	filter := bson.M{}
-	if ctr.ID != nil {
-		objectID, _ := primitive.ObjectIDFromHex(*ctr.ID)
-		filter["_id"] = objectID
+	if ctr.ID == nil {
+		return errors.New("repository:mongodb: Delte failed: {{.SmallName}} primary id required")
 	}
-	if ctr.FieldOne != nil {
-		filter["field_one"] = ctr.FieldOne
+
+	objectId, err := primitive.ObjectIDFromHex(*ctr.ID)
+	if err != nil {
+		return errors.New("repository:mongodb: Delete failed: {{.SmallName}} primary id unable to convert from hex to ObjectID")
 	}
+
+	filter := bson.M{"_id": objectId}
 
 	now := time.Now()
 	update := bson.M{
@@ -223,5 +245,27 @@ func (r *{{.UcFirstName}}Mongo) Delete(ctx context.Context, ctr *domain.{{.UcFir
 	}
 
 	return nil
+}
+
+// Convert{{.UcFirstName}} ...
+func convert{{.UcFirstName}}(c *{{.UcFirstName}}) *domain.{{.UcFirstName}} {
+	return &domain.{{.UcFirstName}}{
+		ID:           c.ID.Hex(),
+		FieldOne:     c.FieldOne,
+		TimeStamp: domain.TimeStamp{
+			CreatedAt: c.TimeStamp.CreatedAt,
+			UpdatedAt: c.TimeStamp.UpdatedAt,
+			DeletedAt: c.TimeStamp.DeletedAt,
+		},
+	}
+}
+
+// Convert{{.UcFirstName}}List ...
+func convert{{.UcFirstName}}List(cl []*{{.UcFirstName}}) []*domain.{{.UcFirstName}} {
+	list := make([]*domain.{{.UcFirstName}}, 0)
+	for _, c := range cl {
+		list = append(list, convert{{.UcFirstName}}(c))
+	}
+	return list
 }
 `

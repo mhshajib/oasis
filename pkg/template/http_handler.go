@@ -37,7 +37,7 @@ func New{{.UcFirstName}}Handler(r *chi.Mux, uc domain.{{.UcFirstName}}Usecase) {
 		r.Get("/", handler.Fetch)
 		r.Get("/{id}", handler.FetchByID)
 		r.Put("/{id}", handler.Update)
-		r.Put("/{id}", handler.Delete)
+		r.Delete("/{id}", handler.Delete)
 	})
 }
 
@@ -81,22 +81,12 @@ func (h *{{.UcFirstName}}Handler) Store(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var jsonResponse map[string]interface{}
-	err := json.Unmarshal([]byte(req.Response), &jsonResponse)
-	if err != nil {
-		(&utils.Response{
-			Status:  http.StatusUnprocessableEntity,
-			Message: "Invalid Response JSON",
-			Error:   vErr,
-		}).Render(w)
-		return
-	}
-
 	{{.SmallName}} := domain.{{.UcFirstName}}{
 		FieldOne: req.FieldOne,
 	}
 
-	if err := h.{{.UcFirstName}}Usecase.Store(ctx, &{{.SmallName}}); err != nil {
+	{{.SmallName}}Resp, err := h.{{.UcFirstName}}Usecase.Store(ctx, &{{.SmallName}})
+	if err != nil {
 		log.ErrorWithFields("Failed to create {{.SmallName}}", log.Fields{
 			"event": "store_{{.SmallName}}_log",
 			"error": err.Error(),
@@ -113,7 +103,7 @@ func (h *{{.UcFirstName}}Handler) Store(w http.ResponseWriter, r *http.Request) 
 	(&utils.Response{
 		Status:  http.StatusCreated,
 		Message: "{{.UcFirstName}} created successfully",
-		Data:    {{.SmallName}}.ID,
+		Data:    transformer.TransformClient({{.SmallName}}Resp),
 	}).Render(w)
 }
 
@@ -237,6 +227,17 @@ func (r *ReqUpdate{{.UcFirstName}}) Validate(ctx context.Context) utils.Errors {
 
 // Update modify {{.SmallName}} record
 func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	_, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		(&utils.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Failed to fetch {{.SmallName}}",
+			Error:   err.Error(),
+		}).Render(w)
+		return
+	}
+
 	req := ReqUpdate{{.UcFirstName}}{}
 	ctx := r.Context()
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -254,17 +255,6 @@ func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request)
 			Status:  http.StatusUnprocessableEntity,
 			Message: "Validation error",
 			Error:   vErr,
-		}).Render(w)
-		return
-	}
-
-	id := chi.URLParam(r, "id")
-	_, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		(&utils.Response{
-			Status:  http.StatusBadRequest,
-			Message: "Failed to fetch {{.SmallName}}",
-			Error:   err.Error(),
 		}).Render(w)
 		return
 	}
@@ -301,7 +291,8 @@ func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request)
 		{{.SmallName}}.FieldOne = v
 	}
 
-	if err := h.{{.UcFirstName}}Usecase.Update(ctx, {{.SmallName}}); err != nil {
+	{{.SmallName}}Resp, err := h.{{.UcFirstName}}Usecase.Update(ctx, {{.SmallName}})
+	if err != nil {
 		log.ErrorWithFields("Failed to update {{.SmallName}}", log.Fields{
 			"event": "update_{{.SmallName}}",
 			"error": err.Error(),
@@ -317,7 +308,7 @@ func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request)
 
 	(&utils.Response{
 		Status: http.StatusOK,
-		Data:   transformer.Transform{{.UcFirstName}}({{.SmallName}}),
+		Data:   transformer.Transform{{.UcFirstName}}({{.SmallName}}Resp),
 	}).Render(w)
 }
 
