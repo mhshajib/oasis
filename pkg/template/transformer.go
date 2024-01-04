@@ -5,7 +5,6 @@ package transformer
 
 import (
 	"{{.DomainPath}}"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // {{.UcFirstName}} response body
