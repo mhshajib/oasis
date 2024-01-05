@@ -3,9 +3,7 @@ name: Go Build
 on:
   push:
     tags:
-      - "*"
-#    branches:
-#      - main
+      - "v[0-9]+.*"
 
 permissions:
   contents: write
