@@ -22,5 +22,6 @@ func init() {
 }
 
 func version(cmd *cobra.Command, args []string) {
+	fmt.Printf(logo)
 	fmt.Printf("Version: %s\n", config.Version)
 }

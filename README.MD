@@ -3,7 +3,6 @@
 <p align="center">
   <img src="oasis_logo.png" alt="Alt text" width="200"/>
 </p>
-<h1 align="center">Oasis</h1>
 
 <div align="center">
 Oasis is a powerful CLI tool for generating Golang clean architecture modules including domain, repository, usecase, transformer, migration, seeder and config. Designed to streamline your development process, Oasis is an essential tool for Go developers.

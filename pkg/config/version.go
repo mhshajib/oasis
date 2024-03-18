@@ -1,4 +1,4 @@
 package config
 
 // Version contains application version
-var Version = "Unversioned"
+var Version = "1.0"

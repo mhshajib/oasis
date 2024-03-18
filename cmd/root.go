@@ -18,6 +18,29 @@ var (
 	}
 )
 
+var logo = `
+                                                                                                                        
+     OOOOOOOOO                         AAA                       SSSSSSSSSSSSSSS      IIIIIIIIII        SSSSSSSSSSSSSSS 
+   OO:::::::::OO                      A:::A                    SS:::::::::::::::S     I::::::::I      SS:::::::::::::::S
+ OO:::::::::::::OO                   A:::::A                  S:::::SSSSSS::::::S     I::::::::I     S:::::SSSSSS::::::S
+O:::::::OOO:::::::O                 A:::::::A                 S:::::S     SSSSSSS     II::::::II     S:::::S     SSSSSSS
+O::::::O   O::::::O                A:::::::::A                S:::::S                   I::::I       S:::::S            
+O:::::O     O:::::O               A:::::A:::::A               S:::::S                   I::::I       S:::::S            
+O:::::O     O:::::O              A:::::A A:::::A               S::::SSSS                I::::I        S::::SSSS         
+O:::::O     O:::::O             A:::::A   A:::::A               SS::::::SSSSS           I::::I         SS::::::SSSSS    
+O:::::O     O:::::O            A:::::A     A:::::A                SSS::::::::SS         I::::I           SSS::::::::SS  
+O:::::O     O:::::O           A:::::AAAAAAAAA:::::A                  SSSSSS::::S        I::::I              SSSSSS::::S 
+O:::::O     O:::::O          A:::::::::::::::::::::A                      S:::::S       I::::I                   S:::::S
+O::::::O   O::::::O         A:::::AAAAAAAAAAAAA:::::A                     S:::::S       I::::I                   S:::::S
+O:::::::OOO:::::::O        A:::::A             A:::::A        SSSSSSS     S:::::S     II::::::II     SSSSSSS     S:::::S
+ OO:::::::::::::OO        A:::::A               A:::::A       S::::::SSSSSS:::::S     I::::::::I     S::::::SSSSSS:::::S
+   OO:::::::::OO         A:::::A                 A:::::A      S:::::::::::::::SS      I::::::::I     S:::::::::::::::SS 
+     OOOOOOOOO          AAAAAAA                   AAAAAAA      SSSSSSSSSSSSSSS        IIIIIIIIII      SSSSSSSSSSSSSSS   
+                                                                                                                        
+Oasis is a powerful CLI tool for generating Golang clean architecture modules. Designed to streamline your development process, Oasis is an essential tool for Go developers.
+For more info visit: https://github.com/mhshajib/oasis
+`
+
 func init() {
 	cobra.OnInitialize(initConfig)
 }
