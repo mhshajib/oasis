@@ -80,7 +80,7 @@ func generateDomainFile(domainPath string, snakeCaseModuleName string, templateS
 	return nil
 }
 
-func MakeDomain(cmd *cobra.Command, args []string) {
+func MakeDomain(cmd *cobra.Command, moduleName string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -100,8 +100,6 @@ func MakeDomain(cmd *cobra.Command, args []string) {
 	}
 
 	MakeTimestamp(rootPath)
-
-	moduleName := args[0]
 
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 

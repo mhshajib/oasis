@@ -97,7 +97,7 @@ func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, tem
 	return nil
 }
 
-func MakeHttpHandler(cmd *cobra.Command, args []string) {
+func MakeHttpHandler(cmd *cobra.Command, moduleName string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -109,8 +109,7 @@ func MakeHttpHandler(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
-
-	moduleName := args[0]
+	
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 	filePath := "/" + utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath))
 	if httpHandlerFileExists(filePath, snakeCaseModuleName) {

@@ -24,7 +24,8 @@ func init() {
 }
 
 func makeMigration(cmd *cobra.Command, args []string) {
-	builder.MakeMigration(cmd, args)
+	moduleName := args[0]
+	builder.MakeMigration(cmd, moduleName)
 
 	// Start the animation in a separate goroutine
 	done := make(chan bool)

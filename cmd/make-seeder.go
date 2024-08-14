@@ -24,7 +24,8 @@ func init() {
 }
 
 func makeSeeder(cmd *cobra.Command, args []string) {
-	builder.MakeSeeder(cmd, args)
+	moduleName := args[0]
+	builder.MakeSeeder(cmd, moduleName)
 
 	// Start the animation in a separate goroutine
 	done := make(chan bool)

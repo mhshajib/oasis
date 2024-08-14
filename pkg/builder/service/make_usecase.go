@@ -95,7 +95,7 @@ func generateUsecaseFile(servicePath string, snakeCaseModuleName string, templat
 	return nil
 }
 
-func MakeUsecase(cmd *cobra.Command, args []string) {
+func MakeUsecase(cmd *cobra.Command, moduleName string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -107,8 +107,7 @@ func MakeUsecase(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
-
-	moduleName := args[0]
+	
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
 	if usecaseFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {
