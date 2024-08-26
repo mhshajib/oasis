@@ -85,7 +85,7 @@ func generateMigrationFile(migrationPath string, snakeCaseModuleName string, tem
 	return nil
 }
 
-func MakeMigration(cmd *cobra.Command, moduleName string) {
+func MakeMigration(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)

@@ -89,7 +89,7 @@ func generateSeederFile(seederPath string, snakeCaseModuleName string, templateS
 	return nil
 }
 
-func MakeSeeder(cmd *cobra.Command, moduleName string) {
+func MakeSeeder(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)

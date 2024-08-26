@@ -95,7 +95,7 @@ func generateTransformerFile(servicePath string, snakeCaseModuleName string, tem
 	return nil
 }
 
-func MakeTransformer(cmd *cobra.Command, moduleName string) {
+func MakeTransformer(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -107,7 +107,7 @@ func MakeTransformer(cmd *cobra.Command, moduleName string) {
 		fmt.Println(err)
 		return
 	}
-	
+
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
 	if transformerFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {

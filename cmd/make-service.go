@@ -56,7 +56,7 @@ func makeService(cmd *cobra.Command, args []string) {
 		Label:    "{{ . }}?",
 		Active:   "\u21AA {{ .Name | cyan }}",
 		Inactive: "  {{ .Name | cyan }}",
-		Selected: "\U0001F336 {{ .Name | red | cyan }}",
+		Selected: "\u21AA {{ .Name | red | cyan }}",
 		Details: `
 		--------- Flags ----------
 		{{ "Name:" | faint }}	{{ .Name }}
@@ -95,31 +95,76 @@ func makeService(cmd *cobra.Command, args []string) {
 
 	moduleName, err = promptModuleName.Run()
 
+	fmt.Print("Enter the number of fields: ")
+	var numFields int
+	fmt.Scan(&numFields)
+	fieldNames := make([]string, numFields)
+	fieldTypes := make([]string, numFields)
+	isFiltered := make([]bool, numFields)
+	dataTypes := []string{"string", "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "float32", "float64", "complex64", "complex128", "bool", "byte", "rune", "time.Time", "*Type", "[]Type", "[n]Type", "map[KeyType]ValueType", "chan Type", "func(Type1, Type2) ReturnType", "error"}
+	for i := 0; i < numFields; i++ {
+		fmt.Printf("Enter name for field #%d: ", i+1)
+		var fieldName string
+		fmt.Scan(&fieldName)
+		fieldNames[i] = strings.TrimSpace(fieldName)
+
+		// Create a promptui selector for data types
+		prompt := promptui.Select{
+			Label: "Select Data Type",
+			Items: dataTypes,
+		}
+
+		_, fieldType, err := prompt.Run()
+
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
+
+		fieldTypes[i] = fieldType
+
+		addFiltersPrompt := promptui.Select{
+			Label: "Add filterable fields within this field?",
+			Items: []string{"Yes", "No"},
+		}
+		_, addFilters, err := addFiltersPrompt.Run()
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
+
+		if addFilters == "Yes" {
+			isFiltered[i] = true
+		} else {
+			isFiltered[i] = false
+		}
+	}
+
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "domain" {
-		builder.MakeDomain(cmd, moduleName)
+		builder.MakeDomain(cmd, moduleName, numFields, fieldNames, fieldTypes, isFiltered)
 	}
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "repo" {
-		builder.MakeRepository(cmd, moduleName)
+		builder.MakeRepository(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "usecase" {
-		builder.MakeUsecase(cmd, moduleName)
+		builder.MakeUsecase(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "transform" {
-		builder.MakeTransformer(cmd, moduleName)
+		builder.MakeTransformer(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "delivery" {
-		builder.MakeHttpHandler(cmd, moduleName)
+		builder.MakeHttpHandler(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "migration" {
-		builder.MakeMigration(cmd, moduleName)
+		builder.MakeMigration(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if flags[flagIndex].Name == "all" || flags[flagIndex].Name == "seed" {
-		builder.MakeSeeder(cmd, moduleName)
+		builder.MakeSeeder(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	// Start the animation in a separate goroutine

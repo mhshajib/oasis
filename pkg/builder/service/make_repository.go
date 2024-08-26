@@ -95,7 +95,7 @@ func generateRepositoryFile(servicePath string, snakeCaseModuleName string, temp
 	return nil
 }
 
-func MakeRepository(cmd *cobra.Command, moduleName string) {
+func MakeRepository(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -107,7 +107,7 @@ func MakeRepository(cmd *cobra.Command, moduleName string) {
 		fmt.Println(err)
 		return
 	}
-	
+
 	titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName := utils.ProcessString(moduleName)
 
 	if repositoryFileExists("/"+utils.NormalizePath(fmt.Sprintf("%s/%s", rootPath, config.Paths().ServicePath)), snakeCaseModuleName) {

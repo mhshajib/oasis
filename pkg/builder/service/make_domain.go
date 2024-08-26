@@ -23,7 +23,7 @@ func domainFileExists(domainPath string, snakeCaseModuleName string) bool {
 	}
 }
 
-func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string) (string, error) {
 	// Prepare the data
 	domainTemplateData := struct {
 		UcFirstName     string
@@ -80,7 +80,7 @@ func generateDomainFile(domainPath string, snakeCaseModuleName string, templateS
 	return nil
 }
 
-func MakeDomain(cmd *cobra.Command, moduleName string) {
+func MakeDomain(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -108,7 +108,7 @@ func MakeDomain(cmd *cobra.Command, moduleName string) {
 		return
 	}
 
-	templateString, err := parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
