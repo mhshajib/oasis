@@ -11,7 +11,9 @@ import (
 // {{.UcFirstName}} represents a {{.SmallName}}
 type {{.UcFirstName}} struct {
     ID          string              ` + "`json:\"_id,omitempty\"` " + `
-    FieldOne    string             	` + "`json:\"field_one\"`" + `
+    {{range .Fields}}
+    {{.Name}}    {{.Type}}          ` + "`json:\"{{.JsonTag}}\"`" + `
+    {{end}}
     TimeStamp
 }
 
@@ -19,6 +21,9 @@ type {{.UcFirstName}} struct {
 type {{.UcFirstName}}Criteria struct {
     ID            *string
     FieldOne      *string
+    {{range .CriteriaFields}}
+    {{.Name}}    {{.Type}}
+    {{end}}
     Offset, Limit *int64
     WithDeleted   *bool
     SortAsc       bool

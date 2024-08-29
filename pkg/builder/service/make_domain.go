@@ -14,6 +14,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Field struct {
+	Name    string
+	Type    string
+	JsonTag string
+}
+type CriteriaField struct {
+	Name string
+	Type string
+}
+
+func adjustFieldTypeForCriteria(fieldType string) string {
+	// Check if it's a slice type
+	if len(fieldType) > 2 && fieldType[:2] == "[]" {
+		return "[]*" + fieldType[2:]
+	}
+	// Otherwise, make it a pointer type
+	return "*" + fieldType
+}
+
 func domainFileExists(domainPath string, snakeCaseModuleName string) bool {
 	domainFilePath := fmt.Sprintf("%s/%s.go", domainPath, snakeCaseModuleName)
 	if _, err := os.Stat("/" + utils.NormalizePath(domainFilePath)); err == nil {
@@ -23,18 +42,42 @@ func domainFileExists(domainPath string, snakeCaseModuleName string) bool {
 	}
 }
 
-func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string) (string, error) {
+func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) (string, error) {
+	var fields []Field
+	var criteriaFields []CriteriaField
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:    titleCaseFieldName,
+			Type:    fieldTypes[i],
+			JsonTag: snakeCaseFieldName,
+		})
+
+		// Append the field to the criteria fields slice
+		adjustedCriteriaType := adjustFieldTypeForCriteria(fieldTypes[i])
+		criteriaFields = append(criteriaFields, CriteriaField{
+			Name: titleCaseFieldName,
+			Type: adjustedCriteriaType,
+		})
+	}
 	// Prepare the data
 	domainTemplateData := struct {
 		UcFirstName     string
 		SmallName       string
 		SnakeCaseName   string
 		SmallPluralName string
+		Fields          []Field
+		CriteriaFields  []CriteriaField
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
 		SnakeCaseName:   snakeCaseModuleName,
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
+		Fields:          fields,
+		CriteriaFields:  criteriaFields,
 	}
 
 	// Read the contents of the file
@@ -108,7 +151,7 @@ func MakeDomain(cmd *cobra.Command, moduleName string, numFields int, fieldNames
 		return
 	}
 
-	templateString, err := parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes)
+	templateString, err := parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes, isFiltered)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
