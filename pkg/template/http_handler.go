@@ -117,7 +117,7 @@ func (h *{{.UcFirstName}}Handler) Store(w http.ResponseWriter, r *http.Request) 
 	(&utils.Response{
 		Status:  http.StatusCreated,
 		Message: "{{.UcFirstName}} created successfully",
-		Data:    transformer.TransformClient({{.SmallName}}Resp),
+		Data:    transformer.Transform{{.UcFirstName}}({{.SmallName}}Resp),
 	}).Render(w)
 }
 
@@ -146,7 +146,7 @@ func (h *{{.UcFirstName}}Handler) Fetch(w http.ResponseWriter, r *http.Request) 
 	{{range .CriteriaFields}}
 		{{if eq .Type "*string"}}
 			if v := r.URL.Query().Get("{{.JsonTag}}"); v != "" {
-				ctr.{{.Name}} = v
+				ctr.{{.Name}} = &v
 			}
 		{{else if or (eq .Type "int") (eq .Type "int32") (eq .Type "int64") (eq .Type "float64") (eq .Type "float32")}}
 			if v := r.URL.Query().Get("{{.JsonTag}}"); v != "" {
