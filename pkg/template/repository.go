@@ -44,8 +44,8 @@ func New{{.UcFirstName}}Mongo(db *mongo.Database) domain.{{.UcFirstName}}Reposit
 
 // Store insert a new {{.SmallName}} to mongodb
 func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*domain.{{.UcFirstName}}, error) {
-	{{.SmallName}}Data := {{.UcFirstName}}{ {{range .Fields}}
-    	{{.Name}}:    {{.SmallName}}.{{.Name}}, {{end}}
+	{{.SmallName}}Data := {{.UcFirstName}} { {{range .Fields}}
+    	{{.Name}}: {{$.SmallName}}.{{.Name}}, {{end}}
 		TimeStamp: TimeStamp{
 			CreatedAt: {{.SmallName}}.CreatedAt,
 			UpdatedAt: {{.SmallName}}.UpdatedAt,
@@ -190,9 +190,9 @@ func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *doma
 	}
 
 	filter := bson.M{"_id": objectId}
-	{{.SmallName}}Data := {{.UcFirstName}}{
+	{{.SmallName}}Data := {{.UcFirstName}} {
 		ID:           objectId, {{range .Fields}}
-    	{{.Name}}:    {{.SmallName}}.{{.Name}}, {{end}}
+    	{{.Name}}:    {{$.SmallName}}.{{.Name}}, {{end}}
 		TimeStamp: TimeStamp{
 			CreatedAt: {{.SmallName}}.CreatedAt,
 			UpdatedAt: {{.SmallName}}.UpdatedAt,
