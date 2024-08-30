@@ -4,9 +4,11 @@ import (
 	"fmt"
 	builder "oasis/pkg/builder/service"
 	"oasis/pkg/command_options"
+	"oasis/pkg/config"
 	"os/exec"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -26,6 +28,14 @@ func init() {
 }
 
 func makeService(cmd *cobra.Command, args []string) {
+	// Initialize the logger
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.Info("Loading configurations")
+	if err := config.Init(); err != nil {
+		logrus.Warn("Failed to load configuration")
+		logrus.Fatal(err)
+	}
+	logrus.Info("Configurations loaded successfully!")
 
 	// Create a promptui selector for flags
 	flagIndex, flag, err := command_options.FlagPrompt.Run()

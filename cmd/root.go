@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"oasis/pkg/config"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -42,8 +40,7 @@ For more info visit: https://github.com/mhshajib/oasis
 `
 
 func init() {
-	fmt.Printf(logo)
-	cobra.OnInitialize(initConfig)
+	fmt.Printf("Oasis CLI\n")
 }
 
 // Execute executes the root command
@@ -52,14 +49,4 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func initConfig() {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.Info("Loading configurations")
-	if err := config.Init(); err != nil {
-		logrus.Warn("Failed to load configuration")
-		logrus.Fatal(err)
-	}
-	logrus.Info("Configurations loaded successfully!")
 }
