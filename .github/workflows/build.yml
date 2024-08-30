@@ -79,24 +79,64 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset Linux
+      - name: Upload Release Asset Linux AMD 64-bit
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-linux-amd64
-          asset_name: oasis-linux-amd64
+          asset_path: ./linux_amd64
+          asset_name: linux_amd64
           asset_content_type: application/octet-stream
 
-      - name: Upload Release Asset Windows
+      - name: Upload Release Asset Linux AMD 32-bit
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-windows-amd64.exe
-          asset_name: oasis-windows-amd64.exe
+          asset_path: ./linux_386
+          asset_name: linux_386
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Linux ARM 64-bit
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./linux_arm64
+          asset_name: linux_arm64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Windows AMD 64-bit
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./windows_amd64.exe
+          asset_name: windows_amd64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Windows AMD 32-bit
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./windows_386.exe
+          asset_name: windows_386.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Windows ARM 64-bit
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./windows_arm64.exe
+          asset_name: windows_arm64.exe
           asset_content_type: application/octet-stream
 
       - name: Upload Release Asset macOS (Intel)
@@ -105,8 +145,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-darwin-intel-amd64
-          asset_name: oasis-darwin-intel-amd64
+          asset_path: ./darwin_amd64
+          asset_name: darwin_amd64
           asset_content_type: application/octet-stream
 
       - name: Upload Release Asset macOS (Apple Silicon)
@@ -115,6 +155,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oasis-darwin-apple-silicon-arm64
-          asset_name: oasis-darwin-apple-silicon-arm64
+          asset_path: ./darwin_arm64
+          asset_name: darwin_arm64
           asset_content_type: application/octet-stream
