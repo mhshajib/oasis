@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"{{.DomainPath}}"
-	"{{.ModuleName}}/pkg/log"
+	"fmt"
 	r "{{.RepositoryPath}}"
 	uc "{{.UsecasePath}}"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,17 +25,11 @@ func (*{{.UcFirstName}}Seeder) Name() string {
 // Seed seed {{.SmallName}} document/table
 func (*{{.UcFirstName}}Seeder) Seed(ctx context.Context, d *mongo.Database) error {
 	{{.SmallName}}Uecase := uc.New{{.UcFirstName}}Usecase(r.New{{.UcFirstName}}Mongo(d))
-
-	{{.SmallPluralName}} := []domain.{{.UcFirstName}}{
-		{
-			FieldOne:     "Field One",
-		},
-	}
+	fmt.Println({{.SmallName}}Uecase)
+	{{.SmallPluralName}} := []domain.{{.UcFirstName}}{}
 
 	for _, {{.SmallName}} := range {{.SmallPluralName}} {
-		if err := {{.SmallName}}Uecase.Store(ctx, &{{.SmallName}}); err != nil {
-			log.Fatal(err)
-		}
+		fmt.Println({{.SmallName}})
 	}
 	return nil
 }

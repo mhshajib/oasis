@@ -23,7 +23,19 @@ func seederFileExists(seederPath string, snakeCaseModuleName string) bool {
 	}
 }
 
-func parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string) (string, error) {
+	var fields []Field
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:    titleCaseFieldName,
+			Type:    fieldTypes[i],
+			JsonTag: snakeCaseFieldName,
+		})
+	}
 	// Prepare the data
 	seederTemplateData := struct {
 		UcFirstName     string
@@ -34,6 +46,7 @@ func parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 		DomainPath      string
 		RepositoryPath  string
 		UsecasePath     string
+		Fields          []Field
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
@@ -43,6 +56,7 @@ func parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
 		RepositoryPath:  utils.NormalizePath(fmt.Sprintf("%s/%s/%s/repository", config.Paths().ModuleName, config.Paths().ServicePath, camelCaseModuleName)),
 		UsecasePath:     utils.NormalizePath(fmt.Sprintf("%s/%s/%s/usecase", config.Paths().ModuleName, config.Paths().ServicePath, camelCaseModuleName)),
+		Fields:          fields,
 	}
 
 	// Read the contents of the file
@@ -67,11 +81,18 @@ func parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 }
 
 func generateSeederFile(seederPath string, snakeCaseModuleName string, templateString string) error {
+	// Create the directory path
+	directoryPath := fmt.Sprintf("%s", seederPath)
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	if err != nil {
+		fmt.Println("Error creating directory:", err)
+		return err
+	}
 
 	seederFileName := fmt.Sprintf("%s/%s.go", seederPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err := ioutil.WriteFile("/"+utils.NormalizePath(seederFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(seederFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
@@ -109,7 +130,7 @@ func MakeSeeder(cmd *cobra.Command, moduleName string, numFields int, fieldNames
 		return
 	}
 
-	templateString, err := parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseSeederTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
