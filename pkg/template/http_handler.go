@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"{{.DomainPath}}"
 	"{{.ModuleName}}/pkg/log"
-	"{{.ModuleName}}/pkg/middleware"
+	//"{{.ModuleName}}/pkg/middleware"
 	"{{.ModuleName}}/pkg/utils"
 	"{{.TransformerPath}}"
 	"go.mongodb.org/mongo-driver/bson/primitive"
