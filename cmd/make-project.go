@@ -132,5 +132,13 @@ func replaceInFile(path string, d os.DirEntry, projectName, packageName string) 
 		}
 	}
 
+	// remove the .git directory
+	if d.Name() == ".git" {
+		err := os.RemoveAll(path)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
