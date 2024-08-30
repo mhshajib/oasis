@@ -25,7 +25,19 @@ func transformerFileExists(servicePath string, snakeCaseModuleName string) bool 
 	}
 }
 
-func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string) (string, error) {
+	var fields []Field
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:    titleCaseFieldName,
+			Type:    fieldTypes[i],
+			JsonTag: snakeCaseFieldName,
+		})
+	}
 	// Prepare the data
 	transformerTemplateData := struct {
 		UcFirstName     string
@@ -34,6 +46,7 @@ func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 		SmallPluralName string
 		ModuleName      string
 		DomainPath      string
+		Fields          []Field
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
@@ -41,6 +54,7 @@ func parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 		ModuleName:      config.Paths().ModuleName,
 		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
+		Fields:          fields,
 	}
 
 	// Read the contents of the template
@@ -115,7 +129,7 @@ func MakeTransformer(cmd *cobra.Command, moduleName string, numFields int, field
 		return
 	}
 
-	templateString, err := parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseTransformerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return

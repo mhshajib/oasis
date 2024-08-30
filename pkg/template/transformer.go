@@ -9,16 +9,16 @@ import (
 
 // {{.UcFirstName}} response body
 type {{.UcFirstName}} struct {
-	ID         	   string  ` + "`json:\"_id,omitempty\"` " + `
-	FieldOne       string              ` + "`json:\"field_one,omitempty\"` " + `
+	ID         	   string  ` + "`json:\"_id,omitempty\"` " + ` {{range .Fields}}
+    {{.Name}}    {{.Type}}          ` + "`json:\"{{.JsonTag}}\"`" + ` {{end}}
 	TimeStamp   domain.TimeStamp    ` + "`json:\"timestamp\"` " + `
 }
 
 // Transform{{.UcFirstName}} ...
 func Transform{{.UcFirstName}}(t *domain.{{.UcFirstName}}) *{{.UcFirstName}} {
 	return &{{.UcFirstName}}{
-		ID:        t.ID,
-		FieldOne:  t.FieldOne,
+		ID:        t.ID, {{range .Fields}}
+    	{{.Name}}: t.{{.Name}}, {{end}}
 		TimeStamp: t.TimeStamp,
 	}
 }

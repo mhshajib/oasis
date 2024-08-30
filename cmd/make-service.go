@@ -55,25 +55,25 @@ func makeService(cmd *cobra.Command, args []string) {
 		builder.MakeRepository(cmd, moduleName, numFields, fieldNames, fieldTypes, isFiltered)
 	}
 
-	/* if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "usecase" {
+	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "usecase" {
 		builder.MakeUsecase(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
 
 	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "transform" {
 		builder.MakeTransformer(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
+	/*
+		if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "delivery" {
+			builder.MakeHttpHandler(cmd, moduleName, numFields, fieldNames, fieldTypes)
+		}
 
-	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "delivery" {
-		builder.MakeHttpHandler(cmd, moduleName, numFields, fieldNames, fieldTypes)
-	}
+		if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "migration" {
+			builder.MakeMigration(cmd, moduleName, numFields, fieldNames, fieldTypes)
+		}
 
-	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "migration" {
-		builder.MakeMigration(cmd, moduleName, numFields, fieldNames, fieldTypes)
-	}
-
-	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "seed" {
-		builder.MakeSeeder(cmd, moduleName, numFields, fieldNames, fieldTypes)
-	} */
+		if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "seed" {
+			builder.MakeSeeder(cmd, moduleName, numFields, fieldNames, fieldTypes)
+		} */
 
 	// Start the animation in a separate goroutine
 	done := make(chan bool)
