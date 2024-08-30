@@ -14,25 +14,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Field struct {
-	Name    string
-	Type    string
-	JsonTag string
-}
-type CriteriaField struct {
-	Name string
-	Type string
-}
-
-func adjustFieldTypeForCriteria(fieldType string) string {
-	// Check if it's a slice type
-	if len(fieldType) > 2 && fieldType[:2] == "[]" {
-		return "[]*" + fieldType[2:]
-	}
-	// Otherwise, make it a pointer type
-	return "*" + fieldType
-}
-
 func domainFileExists(domainPath string, snakeCaseModuleName string) bool {
 	domainFilePath := fmt.Sprintf("%s/%s.go", domainPath, snakeCaseModuleName)
 	if _, err := os.Stat("/" + utils.NormalizePath(domainFilePath)); err == nil {
@@ -56,12 +37,16 @@ func parseDomainTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModu
 			JsonTag: snakeCaseFieldName,
 		})
 
-		// Append the field to the criteria fields slice
-		adjustedCriteriaType := adjustFieldTypeForCriteria(fieldTypes[i])
-		criteriaFields = append(criteriaFields, CriteriaField{
-			Name: titleCaseFieldName,
-			Type: adjustedCriteriaType,
-		})
+		// Check if the field is filtered
+		if isFiltered[i] {
+			// Append the field to the criteria fields slice
+			adjustedCriteriaType := adjustFieldTypeForCriteria(fieldTypes[i])
+			criteriaFields = append(criteriaFields, CriteriaField{
+				Name:    titleCaseFieldName,
+				Type:    adjustedCriteriaType,
+				JsonTag: snakeCaseFieldName,
+			})
+		}
 	}
 	// Prepare the data
 	domainTemplateData := struct {

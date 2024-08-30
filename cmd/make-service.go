@@ -52,7 +52,7 @@ func makeService(cmd *cobra.Command, args []string) {
 		builder.MakeDomain(cmd, moduleName, numFields, fieldNames, fieldTypes, isFiltered)
 	}
 	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "repo" {
-		builder.MakeRepository(cmd, moduleName, numFields, fieldNames, fieldTypes)
+		builder.MakeRepository(cmd, moduleName, numFields, fieldNames, fieldTypes, isFiltered)
 	}
 
 	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "usecase" {

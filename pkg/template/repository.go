@@ -23,8 +23,8 @@ type TimeStamp struct {
 }
 
 type {{.UcFirstName}} struct {
-	ID       primitive.ObjectID ` + "`bson:\"_id,omitempty\"` " + `
-	FieldOne string             ` + "`bson:\"field_one\"` " + `
+	ID       primitive.ObjectID ` + "`bson:\"_id,omitempty\"` " + ` {{range .Fields}}
+    {{.Name}}    {{.Type}}          ` + "`json:\"{{.JsonTag}}\"`" + ` {{end}}
 	TimeStamp
 }
 
@@ -44,8 +44,8 @@ func New{{.UcFirstName}}Mongo(db *mongo.Database) domain.{{.UcFirstName}}Reposit
 
 // Store insert a new {{.SmallName}} to mongodb
 func (r *{{.UcFirstName}}Mongo) Store(ctx context.Context, {{.SmallName}} *domain.{{.UcFirstName}}) (*domain.{{.UcFirstName}}, error) {
-	{{.SmallName}}Data := {{.UcFirstName}}{
-		FieldOne:     {{.SmallName}}.FieldOne,
+	{{.SmallName}}Data := {{.UcFirstName}}{ {{range .Fields}}
+    	{{.Name}}:    {{.SmallName}}.{{.Name}}, {{end}}
 		TimeStamp: TimeStamp{
 			CreatedAt: {{.SmallName}}.CreatedAt,
 			UpdatedAt: {{.SmallName}}.UpdatedAt,
@@ -67,9 +67,12 @@ func (r *{{.UcFirstName}}Mongo) Fetch(ctx context.Context, ctr *domain.{{.UcFirs
 		objectID, _ := primitive.ObjectIDFromHex(*ctr.ID)
 		filter["_id"] = objectID
 	}
-	if ctr.FieldOne != nil {
-		filter["field_one"] = ctr.FieldOne
+	
+	{{range .CriteriaFields}}
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
+	{{end}}
 
 	if ctr.WithDeleted != nil {
 		if *ctr.WithDeleted {
@@ -115,9 +118,11 @@ func (r *{{.UcFirstName}}Mongo) Count(ctx context.Context, ctr *domain.{{.UcFirs
 		objectID, _ := primitive.ObjectIDFromHex(*ctr.ID)
 		filter["_id"] = objectID
 	}
-	if ctr.FieldOne != nil {
-		filter["field_one"] = ctr.FieldOne
+	{{range .CriteriaFields}}
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
+	{{end}}
 
 	if ctr.WithDeleted != nil {
 		if *ctr.WithDeleted {
@@ -150,9 +155,11 @@ func (r *{{.UcFirstName}}Mongo) FetchOne(ctx context.Context, ctr *domain.{{.UcF
 		objectID, _ := primitive.ObjectIDFromHex(*ctr.ID)
 		filter["_id"] = objectID
 	}
-	if ctr.FieldOne != nil {
-		filter["field_one"] = ctr.FieldOne
+	{{range .CriteriaFields}}
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
+	{{end}}
 
 	if ctr.WithDeleted != nil {
 		if *ctr.WithDeleted {
@@ -184,8 +191,8 @@ func (r *{{.UcFirstName}}Mongo) Update(ctx context.Context, {{.SmallName}} *doma
 
 	filter := bson.M{"_id": objectId}
 	{{.SmallName}}Data := {{.UcFirstName}}{
-		ID:           objectId,
-		FieldOne:     {{.SmallName}}.FieldOne,
+		ID:           objectId, {{range .Fields}}
+    	{{.Name}}:    {{.SmallName}}.{{.Name}}, {{end}}
 		TimeStamp: TimeStamp{
 			CreatedAt: {{.SmallName}}.CreatedAt,
 			UpdatedAt: {{.SmallName}}.UpdatedAt,
@@ -250,8 +257,8 @@ func (r *{{.UcFirstName}}Mongo) Delete(ctx context.Context, ctr *domain.{{.UcFir
 // Convert{{.UcFirstName}} ...
 func convert{{.UcFirstName}}(c *{{.UcFirstName}}) *domain.{{.UcFirstName}} {
 	return &domain.{{.UcFirstName}}{
-		ID:           c.ID.Hex(),
-		FieldOne:     c.FieldOne,
+		ID:           c.ID.Hex(), {{range .Fields}}
+    	{{.Name}}:    c.{{.Name}}, {{end}}
 		TimeStamp: domain.TimeStamp{
 			CreatedAt: c.TimeStamp.CreatedAt,
 			UpdatedAt: c.TimeStamp.UpdatedAt,

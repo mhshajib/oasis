@@ -23,7 +23,32 @@ func repositoryFileExists(servicePath string, snakeCaseModuleName string) bool {
 	}
 }
 
-func parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) (string, error) {
+	var fields []Field
+	var criteriaFields []CriteriaField
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:    titleCaseFieldName,
+			Type:    fieldTypes[i],
+			JsonTag: snakeCaseFieldName,
+		})
+
+		// Check if the field is filtered
+		if isFiltered[i] {
+			// Append the field to the criteria fields slice
+			adjustedCriteriaType := adjustFieldTypeForCriteria(fieldTypes[i])
+			criteriaFields = append(criteriaFields, CriteriaField{
+				Name:    titleCaseFieldName,
+				Type:    adjustedCriteriaType,
+				JsonTag: snakeCaseFieldName,
+			})
+		}
+	}
+
 	// Prepare the data
 	repositoryTemplateData := struct {
 		UcFirstName     string
@@ -32,6 +57,8 @@ func parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCase
 		SmallPluralName string
 		ModuleName      string
 		DomainPath      string
+		Fields          []Field
+		CriteriaFields  []CriteriaField
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
@@ -39,6 +66,8 @@ func parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCase
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 		ModuleName:      config.Paths().ModuleName,
 		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
+		Fields:          fields,
+		CriteriaFields:  criteriaFields,
 	}
 
 	// Read the contents of the template
@@ -95,7 +124,7 @@ func generateRepositoryFile(servicePath string, snakeCaseModuleName string, temp
 	return nil
 }
 
-func MakeRepository(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
+func MakeRepository(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -115,7 +144,7 @@ func MakeRepository(cmd *cobra.Command, moduleName string, numFields int, fieldN
 		return
 	}
 
-	templateString, err := parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseRepositoryTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes, isFiltered)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
