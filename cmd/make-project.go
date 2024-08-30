@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"oasis/pkg/command_options"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +18,6 @@ var (
 		Use:   "make:project",
 		Short: "make:project initializes a new project boilerplate on current directory",
 		Long:  "make:project initializes a new project boilerplate on current directory",
-		Args:  cobra.ExactArgs(1),
 		Run:   makeProject,
 	}
 )
@@ -29,8 +29,18 @@ func init() {
 }
 
 func makeProject(cmd *cobra.Command, args []string) {
-	projectName := args[0]
-	fmt.Printf("Project name: %s\n", projectName)
+	// Create a promptui prompt for project name
+	projectName, err := command_options.PromptProjectName.Run()
+	if err != nil || projectName == "" {
+		fmt.Println("Invalid project name:", err)
+		return
+	}
+
+	packageName, err := command_options.PromptPackageName.Run()
+	if err != nil || packageName == "" {
+		fmt.Println("Invalid package name:", err)
+		return
+	}
 
 	// Clone the repository
 	cwd, err := os.Getwd()
@@ -81,7 +91,7 @@ func makeProject(cmd *cobra.Command, args []string) {
 
 		if !d.IsDir() {
 			fmt.Printf("Processing file: %s\n", path)
-			err := replaceInFile(path, d, projectName)
+			err := replaceInFile(path, d, projectName, packageName)
 			if err != nil {
 				return err
 			}
@@ -100,13 +110,13 @@ func shouldSkip(path string) bool {
 	return strings.Contains(path, ".git")
 }
 
-func replaceInFile(path string, d os.DirEntry, projectName string) error {
+func replaceInFile(path string, d os.DirEntry, projectName, packageName string) error {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
 
-	updatedContent := strings.ReplaceAll(string(content), "github.com/mhshajib/oasis_boilerplate", fmt.Sprintf("%s", projectName))
+	updatedContent := strings.ReplaceAll(string(content), "github.com/mhshajib/oasis_boilerplate", fmt.Sprintf("%s", packageName))
 	updatedContent = strings.ReplaceAll(updatedContent, "projectName", projectName)
 
 	err = ioutil.WriteFile(path, []byte(updatedContent), d.Type())

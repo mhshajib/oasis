@@ -37,7 +37,7 @@ O:::::::OOO:::::::O        A:::::A             A:::::A        SSSSSSS     S:::::
    OO:::::::::OO         A:::::A                 A:::::A      S:::::::::::::::SS      I::::::::I     S:::::::::::::::SS 
      OOOOOOOOO          AAAAAAA                   AAAAAAA      SSSSSSSSSSSSSSS        IIIIIIIIII      SSSSSSSSSSSSSSS   
                                                                                                                         
-Oasis is a powerful CLI tool for generating Golang clean architecture modules. Designed to streamline your development process, Oasis is an essential tool for Go developers.
+Oasis is a powerful CLI tool for generating Golang clean architecture modules. Designed to streamline your development process, Oasis is specially designed for oasis_boilerplate which you can create within this CLI tool.
 For more info visit: https://github.com/mhshajib/oasis
 `
 
