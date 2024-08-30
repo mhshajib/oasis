@@ -28,11 +28,29 @@ Oasis is a powerful CLI tool for generating Golang clean architecture modules in
 
 ## Installation
 
-To install Oasis, you can use `go get`:
+#### Installation on Mac/Linux
 
 ```bash
-go get -u github.com/yourusername/oasis
+curl https://raw.githubusercontent.com/mhshajib/oasis/main/install.sh -o install.sh \
+&& chmod +x install.sh \
+&& ./install.sh \
+&& rm install.sh
 ```
+
+#### Uninstallation
+
+```bash
+curl https://raw.githubusercontent.com/mhshajib/oasis/main/uninstall.sh -o uninstall.sh \
+&& chmod +x uninstall.sh \
+&& ./uninstall.sh \
+&& rm uninstall.sh
+```
+
+#### Windows
+
+**For windows download the binary and set environment variable so that you can access the binary from terminal**
+
+**[Download Binary](https://github.com/mhshajib/oasis/releases)**
 
 #### Usage
 
