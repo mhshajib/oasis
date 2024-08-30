@@ -65,36 +65,25 @@ func makeProject(cmd *cobra.Command, args []string) {
 	done <- true
 	fmt.Println("\rProject Initialized Successfully.")
 
-	// Replace the text in all files
-	err = filepath.Walk(projectName, func(path string, info os.FileInfo, err error) error {
+	err = filepath.WalkDir(projectName, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if !info.IsDir() {
-			// Read the file content
-			content, err := ioutil.ReadFile(path)
+		// Skip system and hidden files or directories
+		if strings.HasPrefix(d.Name(), ".") {
+			return nil
+		}
+
+		if shouldSkip(path) {
+			return nil
+		}
+
+		if !d.IsDir() {
+			fmt.Printf("Processing file: %s\n", path)
+			err := replaceInFile(path, d, projectName)
 			if err != nil {
 				return err
-			}
-
-			// Replace the text
-			newContent := strings.ReplaceAll(string(content), "github.com/mhshajib/oasis_boilerplate", fmt.Sprintf("%s/", projectName))
-			finalContent := strings.ReplaceAll(string(newContent), "projectName", projectName)
-
-			// Write the updated content back to the file
-			err = ioutil.WriteFile(path, []byte(finalContent), info.Mode())
-			if err != nil {
-				return err
-			}
-
-			// copy config.develop.yml to config.yml
-			if strings.Contains(path, "config.develop.yml") {
-				destination := strings.ReplaceAll(path, "config.develop.yml", "config.yml")
-				err = ioutil.WriteFile(destination, []byte(finalContent), info.Mode())
-				if err != nil {
-					return err
-				}
 			}
 		}
 
@@ -102,7 +91,36 @@ func makeProject(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		fmt.Println("Failed to replace text in files:", err)
-		return
+		fmt.Printf("Error: %v\n", err)
 	}
+}
+
+func shouldSkip(path string) bool {
+	// Add more conditions if needed
+	return strings.Contains(path, ".git")
+}
+
+func replaceInFile(path string, d os.DirEntry, projectName string) error {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	updatedContent := strings.ReplaceAll(string(content), "github.com/mhshajib/oasis_boilerplate", fmt.Sprintf("%s", projectName))
+	updatedContent = strings.ReplaceAll(updatedContent, "projectName", projectName)
+
+	err = ioutil.WriteFile(path, []byte(updatedContent), d.Type())
+	if err != nil {
+		return err
+	}
+
+	if d.Name() == "config.develop.yml" {
+		newPath := strings.ReplaceAll(path, "config.develop.yml", "config.yml")
+		err := os.Rename(path, newPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
