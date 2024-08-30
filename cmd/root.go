@@ -42,6 +42,7 @@ For more info visit: https://github.com/mhshajib/oasis
 `
 
 func init() {
+	fmt.Printf(logo)
 	cobra.OnInitialize(initConfig)
 }
 
