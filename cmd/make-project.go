@@ -2,8 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -50,7 +53,7 @@ func makeProject(cmd *cobra.Command, args []string) {
 		}
 	}()
 
-	cloneCmd := exec.Command("git", "clone", "https://github.com/rtyley/small-test-repo", projectName)
+	cloneCmd := exec.Command("git", "clone", "https://github.com/mhshajib/oasis_boilerplate", projectName)
 	cloneCmd.Dir = cwd
 	err = cloneCmd.Run()
 	if err != nil {
@@ -61,4 +64,45 @@ func makeProject(cmd *cobra.Command, args []string) {
 
 	done <- true
 	fmt.Println("\rProject Initialized Successfully.")
+
+	// Replace the text in all files
+	err = filepath.Walk(projectName, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			// Read the file content
+			content, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			// Replace the text
+			newContent := strings.ReplaceAll(string(content), "github.com/mhshajib/oasis_boilerplate", fmt.Sprintf("%s/", projectName))
+			finalContent := strings.ReplaceAll(string(newContent), "projectName", projectName)
+
+			// Write the updated content back to the file
+			err = ioutil.WriteFile(path, []byte(finalContent), info.Mode())
+			if err != nil {
+				return err
+			}
+
+			// copy config.develop.yml to config.yml
+			if strings.Contains(path, "config.develop.yml") {
+				destination := strings.ReplaceAll(path, "config.develop.yml", "config.yml")
+				err = ioutil.WriteFile(destination, []byte(finalContent), info.Mode())
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println("Failed to replace text in files:", err)
+		return
+	}
 }
