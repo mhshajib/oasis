@@ -2,13 +2,14 @@
 
 exec_curl(){
   echo "Found oasis latest version: $VERSION"
-  echo "Download may take few minutes depending on your internet speed"
+  echo "Download may take a few minutes depending on your internet speed"
   echo "Downloading oasis to $2"
-  
+  echo "Download URL: $1"  # Added to debug the download URL
+
   curl -L --silent --connect-timeout 30 --retry-delay 5 --retry 5 -o "$2" "$1"
   
   if [ $? -ne 0 ]; then
-    echo "Error: Download failed. Please check your internet connection and try again."
+    echo "Error: Download failed. Please check your internet connection or the URL and try again."
     exit 1
   fi
 
