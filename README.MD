@@ -31,18 +31,18 @@ Oasis is a powerful CLI tool for generating Golang clean architecture modules in
 #### Installation on Mac/Linux
 
 ```bash
-sudo curl https://raw.githubusercontent.com/mhshajib/oasis/main/install.sh -o install.sh \
+curl https://raw.githubusercontent.com/mhshajib/oasis/main/install.sh -o install.sh \
 && chmod +x install.sh \
-&& ./install.sh \
+&& sudo ./install.sh \
 && rm install.sh
 ```
 
 #### Uninstallation
 
 ```bash
-sudo curl https://raw.githubusercontent.com/mhshajib/oasis/main/uninstall.sh -o uninstall.sh \
+curl https://raw.githubusercontent.com/mhshajib/oasis/main/uninstall.sh -o uninstall.sh \
 && chmod +x uninstall.sh \
-&& ./uninstall.sh \
+&& sudo ./uninstall.sh \
 && rm uninstall.sh
 ```
 

@@ -1,13 +1,30 @@
 #!/bin/bash
 
+# Function to show a loading animation
+loading_animation() {
+  local pid=$!
+  local delay=0.2
+  local spinstr='|/-\'
+  local i=0
+  echo -n 'Downloading'
+  
+  while ps -p $pid > /dev/null; do
+    i=$(( (i+1) %4 ))
+    printf "\r%s %s" 'Downloading' "${spinstr:$i:1}"
+    sleep $delay
+  done
+  printf "\r%s %s\n" 'Downloading' 'done'
+}
+
 exec_curl(){
   echo "Found oasis latest version: $VERSION"
   echo "Download may take a few minutes depending on your internet speed"
-  echo "Downloading oasis to $2"
   echo "Download URL: $1"  # Added to debug the download URL
 
-  curl -L --silent --connect-timeout 30 --retry-delay 5 --retry 5 -o "$2" "$1"
-  
+  # Start the download in the background
+  curl -L --silent --connect-timeout 30 --retry-delay 5 --retry 5 -o "$2" "$1" &
+  loading_animation
+
   if [ $? -ne 0 ]; then
     echo "Error: Download failed. Please check your internet connection or the URL and try again."
     exit 1
@@ -52,7 +69,7 @@ if [ -f "$TARGET" ]; then
   echo "$MESSAGE_START"
   chmod +x $TARGET
   echo "$MESSAGE_END"
-  oasis
+  $TARGET
 else
   echo "Error: oasis was not downloaded or the file path is incorrect."
   exit 1
