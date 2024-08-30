@@ -22,8 +22,6 @@ var (
 	}
 )
 
-// var allFlag, domainFlag, migrationFlag, seedFlag, transformFlag, useCaseFlag, repoFlag, deliveryFlag bool
-
 func init() {
 	rootCmd.AddCommand(makeProjectCmd)
 }
@@ -74,6 +72,13 @@ func makeProject(cmd *cobra.Command, args []string) {
 
 	done <- true
 	fmt.Println("\rProject Initialized Successfully.")
+
+	// Remove the .git directory
+	gitDir := filepath.Join(projectName, ".git")
+	err = os.RemoveAll(gitDir)
+	if err != nil {
+		fmt.Printf("Error removing .git directory: %v\n", err)
+	}
 
 	err = filepath.WalkDir(projectName, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
@@ -127,14 +132,6 @@ func replaceInFile(path string, d os.DirEntry, projectName, packageName string) 
 	if d.Name() == "config.develop.yml" {
 		newPath := strings.ReplaceAll(path, "config.develop.yml", "config.yml")
 		err := os.Rename(path, newPath)
-		if err != nil {
-			return err
-		}
-	}
-
-	// remove the .git directory
-	if d.Name() == ".git" {
-		err := os.RemoveAll(path)
 		if err != nil {
 			return err
 		}
