@@ -34,7 +34,7 @@ func GenerateFields(fieldNames *[]string, fieldTypes *[]string, isFiltered *[]bo
 			return
 		}
 
-		(*fieldNames)[i] = fieldType
+		(*fieldTypes)[i] = fieldType
 
 		addFiltersPrompt := promptui.Select{
 			Label: "Add filterable fields within this field?",

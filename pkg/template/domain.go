@@ -10,20 +10,15 @@ import (
 
 // {{.UcFirstName}} represents a {{.SmallName}}
 type {{.UcFirstName}} struct {
-    ID          string              ` + "`json:\"_id,omitempty\"` " + `
-    {{range .Fields}}
-    {{.Name}}    {{.Type}}          ` + "`json:\"{{.JsonTag}}\"`" + `
-    {{end}}
+    ID          string              ` + "`json:\"_id,omitempty\"` " + ` {{range .Fields}}
+    {{.Name}}    {{.Type}}          ` + "`json:\"{{.JsonTag}}\"`" + ` {{end}}
     TimeStamp
 }
 
 // {{.UcFirstName}}Criteria represents criteria for filtering out {{.SmallName}}
 type {{.UcFirstName}}Criteria struct {
-    ID            *string
-    FieldOne      *string
-    {{range .CriteriaFields}}
-    {{.Name}}    {{.Type}}
-    {{end}}
+    ID            *string {{range .CriteriaFields}}
+    {{.Name}}    {{.Type}} {{end}}
     Offset, Limit *int64
     WithDeleted   *bool
     SortAsc       bool
