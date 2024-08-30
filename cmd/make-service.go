@@ -28,10 +28,18 @@ func init() {
 func makeService(cmd *cobra.Command, args []string) {
 
 	// Create a promptui selector for flags
-	flagIndex, _, err := command_options.FlagPrompt.Run()
+	flagIndex, flag, err := command_options.FlagPrompt.Run()
+	if err != nil || flagIndex < 0 || flag == "" {
+		fmt.Println("Error selecting flag:", err)
+		return
+	}
 
 	// Create a promptui prompt for module name
 	moduleName, err := command_options.PromptModuleName.Run()
+	if err != nil || moduleName == "" {
+		fmt.Println("Error getting module name:", err)
+		return
+	}
 
 	fmt.Print("Enter the number of fields: ")
 	var numFields int
