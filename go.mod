@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/gertd/go-pluralize v0.2.1
+	github.com/go-chi/chi v1.5.5
 	github.com/manifoldco/promptui v0.9.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0

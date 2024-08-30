@@ -42,18 +42,32 @@ func New{{.UcFirstName}}Handler(r *chi.Mux, uc domain.{{.UcFirstName}}Usecase) {
 }
 
 // ReqCreate{{.UcFirstName}} represents create {{.SmallName}} request
-type ReqCreate{{.UcFirstName}} struct {
-	FieldOne string ` + "`json:\"field_one,omitempty\"` " + `
+type ReqCreate{{.UcFirstName}} struct {  {{range .Fields}}
+    {{.Name}}    {{.Type}}    ` + "`json:\"{{.JsonTag}}\"`" + ` {{end}}
 }
 
 // Validate validate create {{.SmallName}} requests
 func (r *ReqCreate{{.UcFirstName}}) Validate(ctx context.Context) utils.Errors {
-	r.FieldOne = strings.TrimSpace(r.FieldOne)
-
 	errs := utils.Errors{}
-	if r.FieldOne == "" {
-		errs.Add("field_one", "is required")
-	}
+
+	{{range .Fields}}
+		{{if eq .Type "string"}}
+			r.{{.Name}} = strings.TrimSpace(r.{{.Name}})
+
+			if r.{{.Name}} == "" {
+				errs.Add("{{.JsonTag}}", "is required")
+			}
+		{{else if or (eq .Type "int") (eq .Type "int32") (eq .Type "int64") (eq .Type "float64") (eq .Type "float32")}}
+			if r.{{.Name}} {{.OperatorLessThan}} 0 {
+				errs.Add("{{.JsonTag}}", "must be non-negative")
+			}
+		{{else if or (eq .Type "[]string") (eq .Type "[]int")}}
+			if len(r.{{.Name}}) == 0 {
+				errs.Add("{{.JsonTag}}", "cannot be empty")
+			}
+		{{end}}
+	{{end}}
+
 
 	return errs
 }
@@ -81,8 +95,8 @@ func (h *{{.UcFirstName}}Handler) Store(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	{{.SmallName}} := domain.{{.UcFirstName}}{
-		FieldOne: req.FieldOne,
+	{{.SmallName}} := domain.{{.UcFirstName}}{ {{range .Fields}}
+    	{{.Name}}: req.{{.Name}}, {{end}}
 	}
 
 	{{.SmallName}}Resp, err := h.{{.UcFirstName}}Usecase.Store(ctx, &{{.SmallName}})
@@ -129,9 +143,18 @@ func (h *{{.UcFirstName}}Handler) Fetch(w http.ResponseWriter, r *http.Request) 
 		ctr.ID = &v
 	}
 
-	if v := r.URL.Query().Get("field_one"); v != "" {
-		ctr.FieldOne = &v
-	}
+	{{range .CriteriaFields}}
+		{{if eq .Type "*string"}}
+			if v := r.URL.Query().Get("{{.JsonTag}}"); v != "" {
+				ctr.{{.Name}} = v
+			}
+		{{else if or (eq .Type "int") (eq .Type "int32") (eq .Type "int64") (eq .Type "float64") (eq .Type "float32")}}
+			if v := r.URL.Query().Get("{{.JsonTag}}"); v != "" {
+				val, _ := strconv.Atoi(v)
+				ctr.{{.Name}} = val
+			}
+		{{end}}
+	{{end}}
 
 	if v := r.URL.Query().Get("asc"); v != "" {
 		val, _ := strconv.ParseBool(v)
@@ -209,18 +232,31 @@ func (h *{{.UcFirstName}}Handler) FetchByID(w http.ResponseWriter, r *http.Reque
 	}).Render(w)
 }
 // ReqUpdate{{.UcFirstName}} represents create {{.SmallName}} request
-type ReqUpdate{{.UcFirstName}} struct {
-	FieldOne string ` + "`json:\"field_one,omitempty\"` " + `
+type ReqUpdate{{.UcFirstName}} struct { {{range .Fields}}
+    {{.Name}}    {{.Type}}    ` + "`json:\"{{.JsonTag}}\"`" + ` {{end}}
 }
 
 // Validate validate create {{.SmallName}} requests
 func (r *ReqUpdate{{.UcFirstName}}) Validate(ctx context.Context) utils.Errors {
-	r.FieldOne = strings.TrimSpace(r.FieldOne)
-
 	errs := utils.Errors{}
-	if r.FieldOne == "" {
-		errs.Add("field_one", "is required")
-	}
+
+	{{range .Fields}}
+		{{if eq .Type "string"}}
+			r.{{.Name}} = strings.TrimSpace(r.{{.Name}})
+
+			if r.{{.Name}} == "" {
+				errs.Add("{{.JsonTag}}", "is required")
+			}
+		{{else if or (eq .Type "int") (eq .Type "int32") (eq .Type "int64") (eq .Type "float64") (eq .Type "float32")}}
+			if r.{{.Name}} {{.OperatorLessThan}} 0 {
+				errs.Add("{{.JsonTag}}", "must be non-negative")
+			}
+		{{else if or (eq .Type "[]string") (eq .Type "[]int")}}
+			if len(r.{{.Name}}) == 0 {
+				errs.Add("{{.JsonTag}}", "cannot be empty")
+			}
+		{{end}}
+	{{end}}
 
 	return errs
 }
@@ -287,9 +323,21 @@ func (h *{{.UcFirstName}}Handler) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if v := req.FieldOne; v != "" {
-		{{.SmallName}}.FieldOne = v
-	}
+	{{range .Fields}}
+		{{if eq .Type "string"}}
+			if v := req.{{.Name}}; v != "" {
+				{{$.SmallName}}.{{.Name}} = v
+			}
+		{{else if or (eq .Type "int") (eq .Type "int32") (eq .Type "int64") (eq .Type "float64") (eq .Type "float32")}}
+			if v := req.{{.Name}}; v {{.OperatorGreterThan}} 0 {
+				{{$.SmallName}}.{{.Name}} = v
+			}
+		{{else if or (eq .Type "[]string") (eq .Type "[]int")}}
+			if len(r.{{.Name}}) == 0 {
+				errs.Add("{{.JsonTag}}", "cannot be empty")
+			}
+		{{end}}
+	{{end}}
 
 	{{.SmallName}}Resp, err := h.{{.UcFirstName}}Usecase.Update(ctx, {{.SmallName}})
 	if err != nil {

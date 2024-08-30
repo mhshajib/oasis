@@ -24,7 +24,35 @@ func httpHandlerFileExists(servicePath string, snakeCaseModuleName string) bool 
 	}
 }
 
-func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) (string, error) {
+	var fields []Field
+	var criteriaFields []CriteriaField
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:               titleCaseFieldName,
+			Type:               fieldTypes[i],
+			JsonTag:            snakeCaseFieldName,
+			OperatorLessThan:   template.HTML("<"),
+			OperatorGreterThan: template.HTML(">"),
+		})
+
+		// Check if the field is filtered
+		if isFiltered[i] {
+			// Append the field to the criteria fields slice
+			adjustedCriteriaType := adjustFieldTypeForCriteria(fieldTypes[i])
+			criteriaFields = append(criteriaFields, CriteriaField{
+				Name:               titleCaseFieldName,
+				Type:               adjustedCriteriaType,
+				JsonTag:            snakeCaseFieldName,
+				OperatorLessThan:   template.HTML("<"),
+				OperatorGreterThan: template.HTML(">"),
+			})
+		}
+	}
 	// Prepare the data
 	httpHandlerTemplateData := struct {
 		UcFirstName     string
@@ -34,6 +62,8 @@ func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 		ModuleName      string
 		DomainPath      string
 		TransformerPath string
+		Fields          []Field
+		CriteriaFields  []CriteriaField
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
@@ -42,6 +72,8 @@ func parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCas
 		ModuleName:      config.Paths().ModuleName,
 		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
 		TransformerPath: utils.NormalizePath(fmt.Sprintf("%s/%s/%s/transformer", config.Paths().ModuleName, config.Paths().ServicePath, camelCaseModuleName)),
+		Fields:          fields,
+		CriteriaFields:  criteriaFields,
 	}
 
 	// Read the contents of the file
@@ -97,7 +129,7 @@ func generateHttpHandlerFile(servicePath string, snakeCaseModuleName string, tem
 	return nil
 }
 
-func MakeHttpHandler(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string) {
+func MakeHttpHandler(cmd *cobra.Command, moduleName string, numFields int, fieldNames []string, fieldTypes []string, isFiltered []bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -117,7 +149,7 @@ func MakeHttpHandler(cmd *cobra.Command, moduleName string, numFields int, field
 		return
 	}
 
-	templateString, err := parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseHttpHandlerTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes, isFiltered)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return

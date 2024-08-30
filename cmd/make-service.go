@@ -62,10 +62,12 @@ func makeService(cmd *cobra.Command, args []string) {
 	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "transform" {
 		builder.MakeTransformer(cmd, moduleName, numFields, fieldNames, fieldTypes)
 	}
+
+	if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "delivery" {
+		builder.MakeHttpHandler(cmd, moduleName, numFields, fieldNames, fieldTypes, isFiltered)
+	}
 	/*
-		if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "delivery" {
-			builder.MakeHttpHandler(cmd, moduleName, numFields, fieldNames, fieldTypes)
-		}
+
 
 		if command_options.Flags[flagIndex].Name == "all" || command_options.Flags[flagIndex].Name == "migration" {
 			builder.MakeMigration(cmd, moduleName, numFields, fieldNames, fieldTypes)

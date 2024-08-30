@@ -1,14 +1,20 @@
 package builder
 
+import "html/template"
+
 type Field struct {
-	Name    string
-	Type    string
-	JsonTag string
+	Name               string
+	Type               string
+	JsonTag            string
+	OperatorLessThan   template.HTML
+	OperatorGreterThan template.HTML
 }
 type CriteriaField struct {
-	Name    string
-	Type    string
-	JsonTag string
+	Name               string
+	Type               string
+	JsonTag            string
+	OperatorLessThan   template.HTML
+	OperatorGreterThan template.HTML
 }
 
 func adjustFieldTypeForCriteria(fieldType string) string {
