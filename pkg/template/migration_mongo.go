@@ -24,7 +24,9 @@ func (*{{.UcFirstName}}) Name() string {
 func (*{{.UcFirstName}}) Indices() []mongo.IndexModel {
 	indices := []mongo.IndexModel{
 		{
-			Keys:    bson.D{{"{{"}}Key: "field_one", Value: "text"{{"}}"}},
+			Keys: bson.D{ {{range .Fields}} {{if eq .Type "string"}}
+					{Key: "{{.JsonTag}}", Value: "text"}, {{end}} {{end}}
+			},
 			Options: options.Index().SetUnique(true),
 		},
 	}

@@ -23,7 +23,19 @@ func migrationFileExists(migrationPath string, snakeCaseModuleName string) bool 
 	}
 }
 
-func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string) (string, error) {
+func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName string, numFields int, fieldNames []string, fieldTypes []string) (string, error) {
+	var fields []Field
+	for i := 0; i < numFields; i++ {
+		// Process the field names
+		titleCaseFieldName, snakeCaseFieldName, _ := utils.ProcessString(fieldNames[i])
+
+		// Append the field to the fields slice
+		fields = append(fields, Field{
+			Name:    titleCaseFieldName,
+			Type:    fieldTypes[i],
+			JsonTag: snakeCaseFieldName,
+		})
+	}
 	// Prepare the data
 	migrationTemplateData := struct {
 		UcFirstName     string
@@ -32,6 +44,7 @@ func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseM
 		SmallPluralName string
 		ModuleName      string
 		DomainPath      string
+		Fields          []Field
 	}{
 		UcFirstName:     titleCaseModuleName,
 		SmallName:       camelCaseModuleName,
@@ -39,6 +52,7 @@ func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseM
 		SmallPluralName: utils.ToPlural(snakeCaseModuleName),
 		ModuleName:      config.Paths().ModuleName,
 		DomainPath:      utils.NormalizePath(fmt.Sprintf("%s/%s", config.Paths().ModuleName, config.Paths().DomainPath)),
+		Fields:          fields,
 	}
 
 	// Read the contents of the file
@@ -63,11 +77,18 @@ func parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseM
 }
 
 func generateMigrationFile(migrationPath string, snakeCaseModuleName string, templateString string) error {
+	// Create the directory path
+	directoryPath := fmt.Sprintf("%s", migrationPath)
+	err := os.MkdirAll("/"+utils.NormalizePath(directoryPath), os.ModePerm) // os.ModePerm is 0777
+	if err != nil {
+		fmt.Println("Error creating directory:", err)
+		return err
+	}
 
 	migrationFileName := fmt.Sprintf("%s/%s.go", migrationPath, snakeCaseModuleName)
 
 	// Write the code to the file
-	err := ioutil.WriteFile("/"+utils.NormalizePath(migrationFileName), []byte(templateString), 0644)
+	err = ioutil.WriteFile("/"+utils.NormalizePath(migrationFileName), []byte(templateString), 0644)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
 		return err
@@ -105,7 +126,7 @@ func MakeMigration(cmd *cobra.Command, moduleName string, numFields int, fieldNa
 		return
 	}
 
-	templateString, err := parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName)
+	templateString, err := parseMigrationTemplate(titleCaseModuleName, snakeCaseModuleName, camelCaseModuleName, numFields, fieldNames, fieldTypes)
 	if err != nil {
 		fmt.Println("Error parsing template:", err)
 		return
