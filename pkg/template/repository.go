@@ -69,7 +69,7 @@ func (r *{{.UcFirstName}}Mongo) Fetch(ctx context.Context, ctr *domain.{{.UcFirs
 	}
 	
 	{{range .CriteriaFields}}
-	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int") (eq .Type "[]*bool")}}len(ctr.{{.Name}}) > 0{{end}} {
 		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
 	{{end}}
@@ -119,7 +119,7 @@ func (r *{{.UcFirstName}}Mongo) Count(ctx context.Context, ctr *domain.{{.UcFirs
 		filter["_id"] = objectID
 	}
 	{{range .CriteriaFields}}
-	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int") (eq .Type "[]*bool")}}len(ctr.{{.Name}}) > 0{{end}} {
 		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
 	{{end}}
@@ -156,7 +156,7 @@ func (r *{{.UcFirstName}}Mongo) FetchOne(ctx context.Context, ctr *domain.{{.UcF
 		filter["_id"] = objectID
 	}
 	{{range .CriteriaFields}}
-	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int")}}len(ctr.{{.Name}}) > 0{{end}} {
+	if {{if eq .Type "*string"}}ctr.{{.Name}} != nil{{else if or (eq .Type "*int") (eq .Type "*float64") (eq .Type "*float32")}}*ctr.{{.Name}} >= 0{{else if or (eq .Type "[]string") (eq .Type "[]*string") (eq .Type "[]int") (eq .Type "[]*int") (eq .Type "[]*bool")}}len(ctr.{{.Name}}) > 0{{end}} {
 		filter["{{.JsonTag}}"] = ctr.{{.Name}}
 	}
 	{{end}}
